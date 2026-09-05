@@ -5,39 +5,39 @@ import { Lock, Mail, KeyRound } from 'lucide-react';
 import DecryptedText from './reactbits/DecryptedText';
 import StarBorder from './reactbits/StarBorder';
 
+import { loginThunk } from '../store/slices/authSlice';
+
 function Login() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [role, setRole] = useState('BRAND_MANAGER');
   const [errorMsg, setErrorMsg] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setErrorMsg('');
 
     if (!email || !password) {
       setErrorMsg('Please enter both email and password.');
       return;
     }
 
-    dispatch({
-      type: 'auth/login/fulfilled',
-      payload: {
-        token: 'new-token',
-        role: role,
-        username: email.split('@')[0] || 'User'
+    setLoading(true);
+    try {
+      const result = await dispatch(loginThunk({ email, password }));
+      if (loginThunk.fulfilled.match(result)) {
+        navigate('/dashboard');
+      } else {
+        setErrorMsg(result.payload || 'Invalid email or password.');
       }
-    });
-
-    navigate('/');
-  };
-
-  const handleDemoFill = (selectedRole, demoEmail) => {
-    setRole(selectedRole);
-    setEmail(demoEmail);
-    setPassword('robust key 2026');
+    } catch (err) {
+      setErrorMsg(err.message || 'Login failed. Please check your credentials.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -96,39 +96,6 @@ function Login() {
           <p style={{ color: '#94a3b8', fontSize: '0.85rem', margin: 0 }}>
             Sign in to access your SocialSift intelligence workspace
           </p>
-        </div>
-
-        {/* Role Quick Selector */}
-        <div style={{ marginBottom: '1.5rem' }}>
-          <label style={{ display: 'block', fontSize: '0.74rem', color: '#64748b', marginBottom: '0.5rem', fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase' }}>
-            Select Workspace Role
-          </label>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.5rem' }}>
-            {[
-              { id: 'BRAND_MANAGER', label: 'Brand Manager', email: 'agency@domain.com' },
-              { id: 'INFLUENCER', label: 'Influencer', email: 'creator@social.com' },
-              { id: 'PLATFORM_ANALYST', label: 'Analyst', email: 'analyst@domain.com' }
-            ].map((item) => (
-              <button
-                key={item.id}
-                type="button"
-                onClick={() => handleDemoFill(item.id, item.email)}
-                style={{
-                  padding: '0.55rem 0.25rem',
-                  fontSize: '0.75rem',
-                  fontWeight: 600,
-                  borderRadius: '8px',
-                  border: role === item.id ? '1px solid rgba(99, 102, 241, 0.5)' : '1px solid rgba(255, 255, 255, 0.08)',
-                  backgroundColor: role === item.id ? 'rgba(99, 102, 241, 0.2)' : 'rgba(255, 255, 255, 0.03)',
-                  color: role === item.id ? '#ffffff' : '#94a3b8',
-                  cursor: 'pointer',
-                  transition: 'all 0.15s ease'
-                }}
-              >
-                {item.label}
-              </button>
-            ))}
-          </div>
         </div>
 
         {/* Strict Contract Form */}
@@ -195,14 +162,15 @@ function Login() {
           <StarBorder
             as="button"
             type="submit"
+            disabled={loading}
             color="#a855f7"
             speed="4s"
             thickness={2}
             backgroundColor="linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)"
             borderColor="rgba(168, 85, 247, 0.5)"
-            style={{ width: '100%', marginTop: '0.5rem', borderRadius: '10px' }}
+            style={{ width: '100%', marginTop: '0.5rem', borderRadius: '10px', opacity: loading ? 0.7 : 1 }}
           >
-            <span style={{ fontWeight: 700, fontSize: '0.95rem' }}>Login</span>
+            <span style={{ fontWeight: 700, fontSize: '0.95rem' }}>{loading ? 'Signing In...' : 'Login'}</span>
           </StarBorder>
         </form>
 

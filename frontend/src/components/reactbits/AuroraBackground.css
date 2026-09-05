@@ -2,9 +2,27 @@
   position: relative;
   min-height: 100vh;
   width: 100%;
-  background-color: #0b0f19;
+  background-color: #06070d;
   color: #f1f5f9;
   overflow-x: hidden;
+}
+
+.enterprise-aurora-layer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.enterprise-vignette-overlay {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% 50%, transparent 40%, rgba(6, 7, 13, 0.4) 85%, rgba(6, 7, 13, 0.65) 100%);
+  pointer-events: none;
 }
 
 .enterprise-grid-pattern {
@@ -12,8 +30,8 @@
   inset: 0;
   pointer-events: none;
   background-image: 
-    radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px);
-  background-size: 24px 24px;
+    radial-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+  background-size: 28px 28px;
   z-index: 0;
 }
 
@@ -23,4 +41,5 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  background: transparent;
 }

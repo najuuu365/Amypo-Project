@@ -1,0 +1,705 @@
+.helios-dashboard-container {
+  max-width: 1360px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 4rem 1.5rem;
+  color: #f8fafc;
+  position: relative;
+  z-index: 2;
+  background: transparent;
+}
+
+/* Outer Helios Frame */
+.helios-frame {
+  background: rgba(14, 18, 30, 0.75);
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+  border-radius: 28px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 
+    0 30px 90px rgba(0, 0, 0, 0.65),
+    0 0 50px rgba(168, 85, 247, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  padding: 2.25rem;
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  gap: 2.25rem;
+}
+
+/* Left Helios Sidebar */
+.helios-sidebar {
+  width: 220px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+  padding-right: 1.75rem;
+}
+
+.helios-sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 2.25rem;
+  padding-left: 0.25rem;
+}
+
+.helios-brand-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 1.1rem;
+  color: #ffffff;
+  box-shadow: 0 0 14px rgba(236, 72, 153, 0.4);
+}
+
+.helios-brand-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: -0.01em;
+}
+
+.helios-sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  flex: 1;
+}
+
+.helios-sidebar-link,
+.helios-sidebar-link-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.8rem 1.1rem;
+  border-radius: 16px;
+  color: #94a3b8;
+  text-decoration: none;
+  font-size: 0.92rem;
+  font-weight: 500;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+}
+
+.helios-sidebar-link:hover,
+.helios-sidebar-link-btn:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* Active glowing gradient pill matching Helios spec image */
+.helios-sidebar-link.active {
+  background: linear-gradient(90deg, rgba(236, 72, 153, 0.22) 0%, rgba(168, 85, 247, 0.35) 100%);
+  border: 1px solid rgba(244, 114, 182, 0.3);
+  color: #ffffff;
+  font-weight: 600;
+  box-shadow: 0 4px 20px rgba(168, 85, 247, 0.25);
+}
+
+.helios-sidebar-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* Right Main Content */
+.helios-main-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.helios-sub-controls-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.75rem;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+}
+
+@media (max-width: 960px) {
+  .helios-frame {
+    flex-direction: column;
+    padding: 1.5rem;
+  }
+  .helios-sidebar {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    padding-right: 0;
+    padding-bottom: 1.25rem;
+  }
+  .helios-sidebar-nav {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+  .helios-sidebar-footer {
+    display: none;
+  }
+}
+
+/* Top Header Bar */
+.helios-top-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+}
+
+.helios-greeting h1 {
+  font-size: 2.4rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0 0 0.35rem 0;
+  letter-spacing: -0.025em;
+  line-height: 1.15;
+}
+
+.helios-greeting-name {
+  background: linear-gradient(135deg, #ffffff 30%, #f472b6 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.helios-greeting p {
+  color: #94a3b8;
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+.helios-top-controls {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+}
+
+/* Search pill: Ask helios.ai anything */
+.helios-search-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0.65rem 1.25rem;
+  border-radius: 9999px;
+  background: rgba(22, 27, 44, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #cbd5e1;
+  font-size: 0.88rem;
+  min-width: 260px;
+  transition: all 0.2s ease;
+}
+
+.helios-search-bar:focus-within {
+  border-color: rgba(168, 85, 247, 0.5);
+  box-shadow: 0 0 16px rgba(168, 85, 247, 0.25);
+}
+
+.helios-search-bar input {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #f8fafc;
+  font-size: 0.88rem;
+  width: 100%;
+}
+
+.helios-icon-btn {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: rgba(22, 27, 44, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #cbd5e1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.helios-icon-btn:hover {
+  background: rgba(30, 36, 58, 0.9);
+  color: #ffffff;
+}
+
+.helios-pulse-dot {
+  position: absolute;
+  top: 9px;
+  right: 9px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background-color: #10b981;
+  box-shadow: 0 0 8px #10b981;
+}
+
+/* User Profile chip (Helios spec) */
+.helios-profile-chip {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.35rem 0.85rem 0.35rem 0.45rem;
+  border-radius: 9999px;
+  background: rgba(22, 27, 44, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.helios-profile-chip:hover {
+  border-color: rgba(168, 85, 247, 0.4);
+  box-shadow: 0 0 16px rgba(168, 85, 247, 0.2);
+}
+
+.helios-avatar-img {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #a855f7;
+}
+
+.helios-profile-meta {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  line-height: 1.2;
+}
+
+.helios-profile-name {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #f8fafc;
+}
+
+.helios-profile-email {
+  font-size: 0.75rem;
+  color: #94a3b8;
+}
+
+/* Sub-Pills Bar (Market, Wallet, Tools) */
+.helios-sub-pills {
+  display: flex;
+  gap: 0.65rem;
+  margin-bottom: 2rem;
+}
+
+.sub-pill-btn {
+  padding: 0.55rem 1.4rem;
+  border-radius: 9999px;
+  background: rgba(22, 27, 44, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #94a3b8;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.sub-pill-btn:hover {
+  color: #ffffff;
+  background: rgba(30, 36, 58, 0.8);
+}
+
+.sub-pill-btn.active {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.3) 0%, rgba(236, 72, 153, 0.3) 100%);
+  color: #ffffff;
+  border-color: rgba(236, 72, 153, 0.45);
+  box-shadow: 0 0 20px rgba(236, 72, 153, 0.25);
+}
+
+/* Middle Row: 3 Column Grid */
+.helios-middle-grid {
+  display: grid;
+  grid-template-columns: 1.15fr 1.35fr 1.5fr;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+@media (max-width: 1080px) {
+  .helios-middle-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Holding & Decisions Stack */
+.helios-holding-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.helios-card {
+  background: rgba(18, 22, 36, 0.65);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  padding: 1.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.helios-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.helios-card-title {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #94a3b8;
+  margin: 0;
+}
+
+.helios-timeframe-dropdown {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: #cbd5e1;
+  cursor: pointer;
+}
+
+.helios-big-amount {
+  font-size: 2.3rem;
+  font-weight: 800;
+  color: #f8fafc;
+  margin: 0 0 0.5rem 0;
+  letter-spacing: -0.02em;
+}
+
+/* Decisions Powered by Data Card */
+.decisions-card {
+  background: radial-gradient(circle at 50% 120%, rgba(236, 72, 153, 0.25) 0%, rgba(18, 22, 36, 0.7) 70%);
+  border-color: rgba(236, 72, 153, 0.3);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 1.75rem 1.5rem;
+}
+
+.decisions-title {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0 0 0.4rem 0;
+}
+
+.decisions-desc {
+  font-size: 0.85rem;
+  color: #cbd5e1;
+  line-height: 1.5;
+  margin: 0 0 1.5rem 0;
+}
+
+.explore-insights-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0.65rem 1.4rem;
+  border-radius: 9999px;
+  background: linear-gradient(135deg, rgba(236, 72, 153, 0.8) 0%, rgba(168, 85, 247, 0.8) 100%);
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 0.88rem;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 0 24px rgba(236, 72, 153, 0.45);
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  align-self: center;
+}
+
+.explore-insights-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 32px rgba(236, 72, 153, 0.65);
+}
+
+/* Watchlist Card */
+.watchlist-filter-row {
+  display: flex;
+  gap: 4px;
+}
+
+.watchlist-pill {
+  padding: 3px 10px;
+  border-radius: 9999px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #94a3b8;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.watchlist-pill.active {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
+.watchlist-item-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  margin-top: 1rem;
+}
+
+.watchlist-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.6rem 0.5rem;
+  border-radius: 10px;
+  transition: background 0.15s ease;
+}
+
+.watchlist-row:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.watchlist-item-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.watchlist-logo-box {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #a855f7;
+}
+
+.watchlist-item-name {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #f8fafc;
+  display: block;
+}
+
+.watchlist-item-sub {
+  font-size: 0.72rem;
+  color: #64748b;
+  display: block;
+}
+
+.watchlist-item-right {
+  text-align: right;
+}
+
+.watchlist-item-price {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #f8fafc;
+  display: block;
+}
+
+.watchlist-item-gain {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #10b981;
+}
+
+/* My Portfolio Card with 4 item grid */
+.portfolio-assets-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.85rem;
+  margin-top: 1rem;
+}
+
+.portfolio-asset-box {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 14px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.asset-box-val {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+.asset-box-gain {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #10b981;
+}
+
+.asset-box-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 0.4rem;
+  font-size: 0.72rem;
+  color: #64748b;
+}
+
+.asset-box-tag {
+  font-weight: 700;
+  color: #cbd5e1;
+}
+
+/* Bottom: Large Portfolio Performance Card (Helios spec) */
+.helios-performance-card {
+  background: rgba(18, 22, 36, 0.65);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 24px;
+  padding: 2rem;
+  margin-top: 1rem;
+}
+
+.performance-top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.performance-title-block h3 {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0 0 0.25rem 0;
+}
+
+.performance-title-block p {
+  font-size: 0.82rem;
+  color: #64748b;
+  margin: 0;
+}
+
+.perf-time-pills {
+  display: flex;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.04);
+  padding: 4px;
+  border-radius: 9999px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.perf-pill-btn {
+  padding: 4px 12px;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #94a3b8;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.perf-pill-btn.active {
+  background: rgba(244, 114, 182, 0.25);
+  color: #ffffff;
+  border: 1px solid rgba(244, 114, 182, 0.4);
+}
+
+.chart-svg-wrapper {
+  position: relative;
+  width: 100%;
+  height: 240px;
+}
+
+.helios-curve-svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.chart-tooltip-bubble {
+  position: absolute;
+  top: 30px;
+  left: 58%;
+  transform: translate(-50%, -100%);
+  background: rgba(14, 18, 30, 0.95);
+  border: 1px solid rgba(244, 114, 182, 0.5);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6), 0 0 20px rgba(244, 114, 182, 0.3);
+  padding: 6px 12px;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.tooltip-date-text {
+  font-size: 0.7rem;
+  color: #94a3b8;
+}
+
+.tooltip-val-text {
+  font-size: 0.92rem;
+  font-weight: 800;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.tooltip-badge-gain {
+  font-size: 0.7rem;
+  color: #10b981;
+  background: rgba(16, 185, 129, 0.15);
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+
+.chart-months-axis {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1rem;
+  padding: 0 10px;
+}
+
+.month-label {
+  font-size: 0.75rem;
+  color: #64748b;
+  font-weight: 600;
+}
+
+/* Secondary collapsible analytics section for testcase contract compatibility */
+.integrated-analytics-section {
+  margin-top: 2.5rem;
+  padding-top: 2rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}

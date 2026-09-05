@@ -92,18 +92,40 @@ void main() {
   colors[1] = ColorStop(uColorStops[1], 0.5);
   colors[2] = ColorStop(uColorStops[2], 1.0);
   
+  // Smooth diagonal color blend for realistic atmospheric light
   vec3 rampColor;
-  COLOR_RAMP(colors, uv.x, rampColor);
-  
+  float colorUv = clamp(uv.x + 0.2 * sin(uv.y * 3.14159 + uTime * 0.2), 0.0, 1.0);
+  COLOR_RAMP(colors, colorUv, rampColor);
+
+  // Flowing ribbon 1 (Upper region)
+  float noise1 = snoise(vec2(uv.x * 2.0 + uTime * 0.12, uTime * 0.22)) * 0.4 * uAmplitude;
+  float wave1Center = 0.78 + 0.12 * sin(uv.x * 2.5 + uTime * 0.15) + noise1;
+  float wave1 = smoothstep(0.40, 0.0, abs(uv.y - wave1Center));
+
+  // Flowing ribbon 2 (Mid-screen region)
+  float noise2 = snoise(vec2(uv.x * 2.4 - uTime * 0.14, uv.y * 1.2 + uTime * 0.18)) * 0.35 * uAmplitude;
+  float wave2Center = 0.50 + 0.18 * cos(uv.x * 3.2 - uTime * 0.12) + noise2;
+  float wave2 = smoothstep(0.42, 0.0, abs(uv.y - wave2Center));
+
+  // Flowing ribbon 3 (Lower region, spanning bottom of the page)
+  float noise3 = snoise(vec2(uv.x * 1.8 + uTime * 0.09, uv.y * 1.5 - uTime * 0.14)) * 0.38 * uAmplitude;
+  float wave3Center = 0.22 + 0.15 * sin(uv.x * 2.0 - uTime * 0.10) + noise3;
+  float wave3 = smoothstep(0.44, 0.0, abs(uv.y - wave3Center));
+
+  // Original exponential wave overlay to preserve ReactBits character
   float height = snoise(vec2(uv.x * 2.0 + uTime * 0.1, uTime * 0.25)) * 0.5 * uAmplitude;
   height = exp(height);
-  height = (uv.y * 2.0 - height + 0.2);
-  float intensity = 0.6 * height;
+  float origH = max(0.0, uv.y * 2.0 - height + 0.2);
+  float origAlpha = smoothstep(0.15 - uBlend * 0.5, 0.15 + uBlend * 0.5, origH * 0.6);
+
+  // Combine ribbons for subtle, dark, atmospheric luxury aurora illumination
+  float intensity = (wave1 * 0.50 + wave2 * 0.45 + wave3 * 0.40 + origAlpha * 0.30);
+  intensity = clamp(intensity, 0.0, 0.85);
+
+  float midPoint = 0.18;
+  float auroraAlpha = smoothstep(midPoint - uBlend * 0.5, midPoint + uBlend * 0.5, intensity) * 0.58;
   
-  float midPoint = 0.20;
-  float auroraAlpha = smoothstep(midPoint - uBlend * 0.5, midPoint + uBlend * 0.5, intensity);
-  
-  vec3 auroraColor = intensity * rampColor;
+  vec3 auroraColor = intensity * rampColor * 0.75;
   
   if (uLightMode > 0.5) {
     float energy = clamp(max(intensity, 0.0), 0.0, 1.0);

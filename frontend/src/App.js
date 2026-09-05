@@ -10,6 +10,7 @@ import AuroraBackground from './components/reactbits/AuroraBackground';
 import Dashboard from './components/dashboard/Dashboard';
 import ManageMarketingCampaigns from './pages/ManageMarketingCampaigns';
 import ManageInfluencerProfile from './pages/ManageInfluencerProfile';
+import UserProfilePage from './pages/UserProfilePage';
 import CampaignEngagementList from './components/campaignEngagement/CampaignEngagementList';
 import EngagementMetricLogList from './components/engagementMetricLog/EngagementMetricLogList';
 import './App.css';
@@ -24,6 +25,7 @@ function App() {
             <Routes>
               <Route path="/" element={<HomePage />} />
               <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/profile" element={<UserProfilePage />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
               <Route path="/campaigns" element={<ManageMarketingCampaigns />} />

@@ -17,7 +17,7 @@ function Register() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const { loading, error, isAuthenticated, user } = useSelector(
+  const { loading, error, isAuthenticated } = useSelector(
     (state) => state.auth || {}
   );
 
@@ -47,8 +47,10 @@ function Register() {
   }, [error, dispatch]);
 
   useEffect(() => {
-    // Nav logic if needed
-  }, [isAuthenticated, user, navigate]);
+    if (isAuthenticated) {
+      navigate('/dashboard');
+    }
+  }, [isAuthenticated, navigate]);
 
   const inputStyle = {
     width: '100%',

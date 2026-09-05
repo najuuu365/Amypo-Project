@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import Aurora from '../components/reactbits/Aurora';
 import SplitFlapText from '../components/reactbits/SplitFlapText';
 import StarBorder from '../components/reactbits/StarBorder';
 import DriftWall from '../components/reactbits/DriftWall';
@@ -72,17 +71,6 @@ export default function HomePage() {
 
   return (
     <div className="homepage-container">
-      {/* Background Aurora WebGL Shader */}
-      <div className="homepage-aurora-bg">
-        <Aurora
-          colorStops={['#5227FF', '#9333ea', '#ec4899']}
-          blend={0.15}
-          amplitude={1.25}
-          speed={1.6}
-        />
-        <div className="aurora-vignette-overlay" />
-      </div>
-
       {/* Ambient background glowing spots */}
       <div className="ambient-purple-glow glow-hero-left" />
       <div className="ambient-purple-glow glow-hero-right" />
