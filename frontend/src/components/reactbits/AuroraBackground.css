@@ -1,0 +1,26 @@
+.enterprise-background {
+  position: relative;
+  min-height: 100vh;
+  width: 100%;
+  background-color: #0b0f19;
+  color: #f1f5f9;
+  overflow-x: hidden;
+}
+
+.enterprise-grid-pattern {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image: 
+    radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  background-size: 24px 24px;
+  z-index: 0;
+}
+
+.enterprise-content-relative {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
