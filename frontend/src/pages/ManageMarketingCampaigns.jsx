@@ -1,5 +1,5 @@
 import React from 'react';
-import MarketingCampaignList from '../components/marketingCampaign/MarketingCampaignForm';
+import MarketingCampaignList from '../components/marketingCampaign/MarketingCampaignList';
 
 export const ManageMarketingCampaigns = () => {
   return (

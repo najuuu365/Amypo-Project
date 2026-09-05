@@ -52,7 +52,9 @@ const ROLE_PROFILES = {
   }
 };
 
-function Navbar() {
+import SafeWrapper from '../common/SafeWrapper';
+
+function NavbarContent() {
   const location = useLocation();
   const dispatch = useDispatch();
   const auth = useSelector((state) => state.auth || {});
@@ -574,4 +576,13 @@ function Navbar() {
   );
 }
 
+function Navbar(props) {
+  return (
+    <SafeWrapper>
+      <NavbarContent {...props} />
+    </SafeWrapper>
+  );
+}
+
+export { Navbar };
 export default Navbar;

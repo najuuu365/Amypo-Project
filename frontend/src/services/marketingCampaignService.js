@@ -223,4 +223,13 @@ const marketingCampaignService = {
   }
 };
 
+export const getAll = marketingCampaignService.getAll;
+export const getById = marketingCampaignService.getById;
+export const create = marketingCampaignService.create;
+export const update = marketingCampaignService.update;
+export const remove = marketingCampaignService.delete;
+export const deleteCampaign = marketingCampaignService.delete;
+export const launch = marketingCampaignService.launch;
+
+export { marketingCampaignService };
 export default marketingCampaignService;

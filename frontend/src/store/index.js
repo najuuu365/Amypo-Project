@@ -5,7 +5,7 @@ import influencerProfileReducer from './slices/influencerProfileSlice';
 import campaignEngagementReducer from './slices/campaignEngagementSlice';
 import engagementMetricLogReducer from './slices/engagementMetricLogSlice';
 
-const store = configureStore({
+export const store = configureStore({
   reducer: {
     auth: authReducer,
     marketingCampaign: marketingCampaignReducer,

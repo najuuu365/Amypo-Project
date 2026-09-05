@@ -6,8 +6,9 @@ import DecryptedText from './reactbits/DecryptedText';
 import StarBorder from './reactbits/StarBorder';
 
 import { loginThunk } from '../store/slices/authSlice';
+import SafeWrapper from './common/SafeWrapper';
 
-function Login() {
+function LoginContent() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -185,4 +186,13 @@ function Login() {
   );
 }
 
+function Login(props) {
+  return (
+    <SafeWrapper>
+      <LoginContent {...props} />
+    </SafeWrapper>
+  );
+}
+
+export { Login };
 export default Login;
