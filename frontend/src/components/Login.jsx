@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useNavigate, Link } from 'react-router-dom';
-import SpotlightCard from './reactbits/SpotlightCard';
 import { Lock, Mail, KeyRound } from 'lucide-react';
 import DecryptedText from './reactbits/DecryptedText';
+import StarBorder from './reactbits/StarBorder';
 
 function Login() {
   const dispatch = useDispatch();
@@ -46,41 +46,46 @@ function Login() {
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        minHeight: 'calc(100vh - 100px)',
-        padding: '2rem 1rem'
+        minHeight: 'calc(100vh - 90px)',
+        padding: '2.5rem 1rem',
+        position: 'relative',
+        zIndex: 2
       }}
     >
-      <SpotlightCard
+      <div
+        className="glass-panel"
         style={{
           width: '100%',
-          maxWidth: '440px',
+          maxWidth: '460px',
           padding: '2.5rem 2rem',
-          backgroundColor: '#111827',
-          border: '1px solid #1e293b'
+          backgroundColor: 'rgba(14, 17, 26, 0.75)',
+          border: '1px solid rgba(255, 255, 255, 0.12)',
+          boxShadow: '0 25px 60px rgba(0, 0, 0, 0.6), 0 0 35px rgba(99, 102, 241, 0.15)'
         }}
       >
         <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
           <div
             style={{
-              width: '48px',
-              height: '48px',
+              width: '52px',
+              height: '52px',
               margin: '0 auto 1rem auto',
-              borderRadius: '10px',
-              backgroundColor: 'rgba(37, 99, 235, 0.12)',
-              border: '1px solid rgba(37, 99, 235, 0.3)',
+              borderRadius: '14px',
+              background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.25) 0%, rgba(168, 85, 247, 0.25) 100%)',
+              border: '1px solid rgba(168, 85, 247, 0.4)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              color: '#3b82f6'
+              color: '#c084fc',
+              boxShadow: '0 0 20px rgba(168, 85, 247, 0.3)'
             }}
           >
-            <Lock size={22} />
+            <Lock size={24} />
           </div>
 
           <h2
             style={{
-              fontSize: '1.5rem',
-              fontWeight: 700,
+              fontSize: '1.6rem',
+              fontWeight: 800,
               color: '#f8fafc',
               marginBottom: '0.35rem',
               letterSpacing: '-0.02em'
@@ -89,13 +94,13 @@ function Login() {
             <DecryptedText text="Account Login" speed={35} />
           </h2>
           <p style={{ color: '#94a3b8', fontSize: '0.85rem', margin: 0 }}>
-            Sign in to access your SocialSift workspace
+            Sign in to access your SocialSift intelligence workspace
           </p>
         </div>
 
         {/* Role Quick Selector */}
         <div style={{ marginBottom: '1.5rem' }}>
-          <label style={{ display: 'block', fontSize: '0.75rem', color: '#64748b', marginBottom: '0.4rem', fontWeight: 600, textTransform: 'uppercase' }}>
+          <label style={{ display: 'block', fontSize: '0.74rem', color: '#64748b', marginBottom: '0.5rem', fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase' }}>
             Select Workspace Role
           </label>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.5rem' }}>
@@ -109,13 +114,13 @@ function Login() {
                 type="button"
                 onClick={() => handleDemoFill(item.id, item.email)}
                 style={{
-                  padding: '0.5rem 0.25rem',
+                  padding: '0.55rem 0.25rem',
                   fontSize: '0.75rem',
                   fontWeight: 600,
-                  borderRadius: '6px',
-                  border: role === item.id ? '1px solid #3b82f6' : '1px solid #1e293b',
-                  backgroundColor: role === item.id ? 'rgba(37, 99, 235, 0.15)' : '#0f172a',
-                  color: role === item.id ? '#60a5fa' : '#94a3b8',
+                  borderRadius: '8px',
+                  border: role === item.id ? '1px solid rgba(99, 102, 241, 0.5)' : '1px solid rgba(255, 255, 255, 0.08)',
+                  backgroundColor: role === item.id ? 'rgba(99, 102, 241, 0.2)' : 'rgba(255, 255, 255, 0.03)',
+                  color: role === item.id ? '#ffffff' : '#94a3b8',
                   cursor: 'pointer',
                   transition: 'all 0.15s ease'
                 }}
@@ -144,8 +149,8 @@ function Login() {
                 boxSizing: 'border-box',
                 padding: '0.75rem 0.9rem',
                 borderRadius: '8px',
-                backgroundColor: '#0f172a',
-                border: '1px solid #1e293b',
+                backgroundColor: 'rgba(10, 12, 20, 0.8)',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
                 color: '#f8fafc',
                 fontSize: '0.9rem',
                 outline: 'none',
@@ -170,8 +175,8 @@ function Login() {
                 boxSizing: 'border-box',
                 padding: '0.75rem 0.9rem',
                 borderRadius: '8px',
-                backgroundColor: '#0f172a',
-                border: '1px solid #1e293b',
+                backgroundColor: 'rgba(10, 12, 20, 0.8)',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
                 color: '#f8fafc',
                 fontSize: '0.9rem',
                 outline: 'none',
@@ -186,36 +191,28 @@ function Login() {
             </div>
           )}
 
-          {/* Strict test contract submit button */}
-          <button
+          {/* Strict test contract submit button with StarBorder effect */}
+          <StarBorder
+            as="button"
             type="submit"
-            style={{
-              width: '100%',
-              marginTop: '0.5rem',
-              padding: '0.75rem',
-              borderRadius: '8px',
-              backgroundColor: '#2563eb',
-              color: '#ffffff',
-              border: '1px solid #3b82f6',
-              fontWeight: 600,
-              fontSize: '0.9rem',
-              cursor: 'pointer',
-              transition: 'background-color 0.15s ease'
-            }}
-            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#1d4ed8')}
-            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#2563eb')}
+            color="#a855f7"
+            speed="4s"
+            thickness={2}
+            backgroundColor="linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)"
+            borderColor="rgba(168, 85, 247, 0.5)"
+            style={{ width: '100%', marginTop: '0.5rem', borderRadius: '10px' }}
           >
-            Login
-          </button>
+            <span style={{ fontWeight: 700, fontSize: '0.95rem' }}>Login</span>
+          </StarBorder>
         </form>
 
         <div style={{ marginTop: '1.5rem', textAlign: 'center', fontSize: '0.85rem', color: '#64748b' }}>
           Don't have an account?{' '}
-          <Link to="/register" style={{ color: '#3b82f6', fontWeight: 600, textDecoration: 'none' }}>
+          <Link to="/register" style={{ color: '#a855f7', fontWeight: 600, textDecoration: 'none' }}>
             Register here
           </Link>
         </div>
-      </SpotlightCard>
+      </div>
     </div>
   );
 }
