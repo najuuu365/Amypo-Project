@@ -10,8 +10,11 @@ import {
   ShieldAlert,
   LogOut,
   LogIn,
-  UserPlus
+  UserPlus,
+  Sparkles
 } from 'lucide-react';
+import CircularText from '../reactbits/CircularText';
+import StarBorder from '../reactbits/StarBorder';
 import DecryptedText from '../reactbits/DecryptedText';
 
 function Navbar() {
@@ -22,7 +25,7 @@ function Navbar() {
   const currentRole = user?.role || auth.role || 'BRAND_MANAGER';
 
   const navLinks = [
-    { to: '/', label: 'Dashboard', Icon: LayoutDashboard },
+    { to: '/', label: 'Home', Icon: LayoutDashboard },
     { to: '/campaigns', label: 'Campaigns', Icon: Megaphone },
     { to: '/profiles', label: 'Influencers', Icon: Users },
     { to: '/engagements', label: 'Engagements', Icon: CheckCircle2 },
@@ -39,56 +42,98 @@ function Navbar() {
         position: 'sticky',
         top: 0,
         zIndex: 50,
-        backgroundColor: '#0f172a',
-        borderBottom: '1px solid #1e293b',
-        padding: '0.75rem 2rem',
+        backgroundColor: 'rgba(7, 7, 13, 0.75)',
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)',
+        borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+        padding: '0.65rem 2rem',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between'
       }}
     >
-      {/* Brand */}
+      {/* Brand & Logo with CircularText */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '2.5rem' }}>
         <Link
           to="/"
           style={{
             display: 'flex',
             alignItems: 'center',
-            gap: '0.65rem',
+            gap: '0.85rem',
             textDecoration: 'none',
             color: '#f8fafc'
           }}
         >
+          {/* Animated Logo with CircularText */}
           <div
             style={{
-              width: '32px',
-              height: '32px',
-              borderRadius: '6px',
-              backgroundColor: '#2563eb',
+              position: 'relative',
+              width: '46px',
+              height: '46px',
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'center',
-              color: '#ffffff',
-              fontWeight: 800,
-              fontSize: '0.9rem'
+              justifyContent: 'center'
             }}
           >
-            S
+            {/* Spinning circular text */}
+            <div
+              style={{
+                position: 'absolute',
+                top: '-77px',
+                left: '-77px',
+                transform: 'scale(0.23)',
+                pointerEvents: 'none',
+                opacity: 0.85
+              }}
+            >
+              <CircularText
+                text="SOCIALSIFT*INTELLIGENCE*"
+                spinDuration={16}
+                onHover="speedUp"
+              />
+            </div>
+
+            {/* Glowing Central Badge */}
+            <div
+              style={{
+                width: '32px',
+                height: '32px',
+                borderRadius: '10px',
+                background: 'linear-gradient(135deg, #6366f1 0%, #a855f7 100%)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#ffffff',
+                fontWeight: 800,
+                fontSize: '0.9rem',
+                boxShadow: '0 0 16px rgba(99, 102, 241, 0.6)',
+                zIndex: 2
+              }}
+            >
+              <Sparkles size={16} />
+            </div>
           </div>
-          <span
-            style={{
-              fontSize: '1.2rem',
-              fontWeight: 700,
-              letterSpacing: '-0.02em',
-              color: '#f8fafc'
-            }}
-          >
-            <DecryptedText text="SocialSift" speed={40} />
-          </span>
+
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <span
+              style={{
+                fontSize: '1.25rem',
+                fontWeight: 800,
+                letterSpacing: '-0.02em',
+                color: '#f8fafc',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.2rem'
+              }}
+            >
+              <DecryptedText text="SocialSift" speed={40} />
+              <span style={{ color: '#818cf8', fontSize: '0.9rem' }}>.ai</span>
+            </span>
+          </div>
         </Link>
 
         {/* Navigation Links */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
           {navLinks.map((link) => {
             const isActive = location.pathname === link.to;
             const IconComponent = link.Icon;
@@ -100,18 +145,18 @@ function Navbar() {
                   display: 'flex',
                   alignItems: 'center',
                   gap: '0.45rem',
-                  padding: '0.45rem 0.8rem',
-                  borderRadius: '6px',
+                  padding: '0.45rem 0.85rem',
+                  borderRadius: '9999px',
                   fontSize: '0.85rem',
                   fontWeight: 500,
                   textDecoration: 'none',
-                  color: isActive ? '#f8fafc' : '#94a3b8',
-                  backgroundColor: isActive ? '#1e293b' : 'transparent',
-                  border: isActive ? '1px solid #334155' : '1px solid transparent',
-                  transition: 'all 0.15s ease'
+                  color: isActive ? '#ffffff' : '#94a3b8',
+                  backgroundColor: isActive ? 'rgba(99, 102, 241, 0.18)' : 'transparent',
+                  border: isActive ? '1px solid rgba(99, 102, 241, 0.35)' : '1px solid transparent',
+                  transition: 'all 0.2s ease'
                 }}
               >
-                <IconComponent size={16} />
+                <IconComponent size={15} color={isActive ? '#818cf8' : '#94a3b8'} />
                 <span>{link.label}</span>
               </Link>
             );
@@ -127,13 +172,13 @@ function Navbar() {
             display: 'flex',
             alignItems: 'center',
             gap: '0.4rem',
-            padding: '0.3rem 0.6rem',
-            borderRadius: '6px',
-            backgroundColor: '#1e293b',
-            border: '1px solid #334155'
+            padding: '0.3rem 0.65rem',
+            borderRadius: '9999px',
+            backgroundColor: 'rgba(255, 255, 255, 0.05)',
+            border: '1px solid rgba(255, 255, 255, 0.1)'
           }}
         >
-          <span style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: 600 }}>ROLE:</span>
+          <span style={{ fontSize: '0.72rem', color: '#64748b', fontWeight: 700, letterSpacing: '0.05em' }}>ROLE:</span>
           <select
             value={currentRole}
             onChange={(e) => handleRoleChange(e.target.value)}
@@ -166,12 +211,12 @@ function Navbar() {
                 fontSize: '0.85rem',
                 color: '#cbd5e1',
                 padding: '0.35rem 0.75rem',
-                backgroundColor: '#1e293b',
-                borderRadius: '6px',
-                border: '1px solid #334155',
+                backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                borderRadius: '9999px',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '0.4rem'
+                gap: '0.45rem'
               }}
             >
               <div
@@ -179,7 +224,8 @@ function Navbar() {
                   width: '8px',
                   height: '8px',
                   borderRadius: '50%',
-                  backgroundColor: '#10b981'
+                  backgroundColor: '#10b981',
+                  boxShadow: '0 0 8px #10b981'
                 }}
               />
               <span>{user?.username || 'Admin'}</span>
@@ -191,11 +237,11 @@ function Navbar() {
                 display: 'flex',
                 alignItems: 'center',
                 gap: '0.4rem',
-                padding: '0.45rem 0.8rem',
-                borderRadius: '6px',
+                padding: '0.45rem 0.85rem',
+                borderRadius: '9999px',
                 backgroundColor: 'transparent',
                 color: '#94a3b8',
-                border: '1px solid #334155',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
                 fontSize: '0.85rem',
                 fontWeight: 500,
                 cursor: 'pointer',
@@ -206,7 +252,7 @@ function Navbar() {
                 e.currentTarget.style.color = '#f87171';
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.borderColor = '#334155';
+                e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.1)';
                 e.currentTarget.style.color = '#94a3b8';
               }}
             >
@@ -215,44 +261,41 @@ function Navbar() {
             </button>
           </div>
         ) : (
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <Link
-              to="/login"
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.35rem',
-                padding: '0.45rem 0.85rem',
-                borderRadius: '6px',
-                backgroundColor: '#1e293b',
-                color: '#f8fafc',
-                textDecoration: 'none',
-                fontSize: '0.85rem',
-                fontWeight: 500,
-                border: '1px solid #334155'
-              }}
-            >
-              <LogIn size={14} />
-              <span>Login</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+            {/* Login button with StarBorder */}
+            <Link to="/login" style={{ textDecoration: 'none' }}>
+              <StarBorder
+                as="div"
+                color="#6366f1"
+                speed="5s"
+                thickness={1}
+                backgroundColor="rgba(15, 23, 42, 0.85)"
+                borderColor="rgba(255, 255, 255, 0.12)"
+                style={{ borderRadius: '9999px' }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', padding: '0.25rem 0.65rem', fontSize: '0.82rem', fontWeight: 600 }}>
+                  <LogIn size={13} color="#818cf8" />
+                  <span>Login</span>
+                </div>
+              </StarBorder>
             </Link>
-            <Link
-              to="/register"
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.35rem',
-                padding: '0.45rem 0.85rem',
-                borderRadius: '6px',
-                backgroundColor: '#2563eb',
-                color: '#ffffff',
-                textDecoration: 'none',
-                fontSize: '0.85rem',
-                fontWeight: 500,
-                border: '1px solid #3b82f6'
-              }}
-            >
-              <UserPlus size={14} />
-              <span>Register</span>
+
+            {/* Register button with StarBorder */}
+            <Link to="/register" style={{ textDecoration: 'none' }}>
+              <StarBorder
+                as="div"
+                color="#ec4899"
+                speed="4s"
+                thickness={1.5}
+                backgroundColor="rgba(79, 70, 229, 0.9)"
+                borderColor="rgba(147, 51, 234, 0.4)"
+                style={{ borderRadius: '9999px' }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', padding: '0.25rem 0.75rem', fontSize: '0.82rem', fontWeight: 700 }}>
+                  <UserPlus size={13} />
+                  <span>Register</span>
+                </div>
+              </StarBorder>
             </Link>
           </div>
         )}
