@@ -1,12 +1,8 @@
 import React from 'react';
-import MarketingCampaignList from '../components/marketingCampaign/MarketingCampaignList';
+import Dashboard from '../components/dashboard/Dashboard';
 
 export const ManageMarketingCampaigns = () => {
-  return (
-    <div style={{ padding: '2rem 1rem' }}>
-      <MarketingCampaignList />
-    </div>
-  );
+  return <Dashboard />;
 };
 
 export default ManageMarketingCampaigns;

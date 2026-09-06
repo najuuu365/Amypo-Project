@@ -156,7 +156,8 @@ export default function Aurora(props) {
       renderer = new Renderer({
         alpha: true,
         premultipliedAlpha: true,
-        antialias: true
+        antialias: false,
+        dpr: 0.5
       });
     } catch (e) {
       console.warn('WebGL not supported for Aurora:', e);
@@ -170,6 +171,8 @@ export default function Aurora(props) {
     gl.enable(gl.BLEND);
     gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
     gl.canvas.style.backgroundColor = 'transparent';
+    gl.canvas.style.width = '100%';
+    gl.canvas.style.height = '100%';
 
     let program;
 
@@ -179,7 +182,7 @@ export default function Aurora(props) {
       const height = ctn.offsetHeight || window.innerHeight || 300;
       renderer.setSize(width, height);
       if (program) {
-        program.uniforms.uResolution.value = [width, height];
+        program.uniforms.uResolution.value = [width * 0.5, height * 0.5];
       }
     }
     window.addEventListener('resize', resize);
@@ -189,13 +192,18 @@ export default function Aurora(props) {
       delete geometry.attributes.uv;
     }
 
-    const colorStopsArray = colorStops.map(hex => {
-      const c = new Color(hex);
-      return [c.r, c.g, c.b];
-    });
+    const parsedColorsCache = new Map();
+    const getParsedColor = (hex) => {
+      if (!parsedColorsCache.has(hex)) {
+        const c = new Color(hex);
+        parsedColorsCache.set(hex, [c.r, c.g, c.b]);
+      }
+      return parsedColorsCache.get(hex);
+    };
 
-    const initialW = ctn.offsetWidth || window.innerWidth || 300;
-    const initialH = ctn.offsetHeight || window.innerHeight || 300;
+    const initialW = (ctn.offsetWidth || window.innerWidth || 300) * 0.5;
+    const initialH = (ctn.offsetHeight || window.innerHeight || 300) * 0.5;
+    const colorStopsArray = colorStops.map(getParsedColor);
 
     program = new Program(gl, {
       vertex: VERT,
@@ -214,22 +222,30 @@ export default function Aurora(props) {
     ctn.appendChild(gl.canvas);
 
     let animateId = 0;
+    let lastRenderTime = 0;
+
     const update = t => {
       animateId = requestAnimationFrame(update);
+
+      if (document.hidden) return;
+
+      // Throttle rendering to max 40 FPS for ultra-smooth performance with low GPU usage
+      if (t - lastRenderTime < 24) return;
+      lastRenderTime = t;
+
       const { time = t * 0.01, speed = 1.0 } = propsRef.current;
       program.uniforms.uTime.value = time * speed * 0.1;
       program.uniforms.uAmplitude.value = propsRef.current.amplitude ?? 1.0;
       program.uniforms.uBlend.value = propsRef.current.blend ?? blend;
       program.uniforms.uLightMode.value = (propsRef.current.lightMode ?? lightMode) ? 1 : 0;
+      
       const stops = propsRef.current.colorStops ?? colorStops;
-      program.uniforms.uColorStops.value = stops.map(hex => {
-        const c = new Color(hex);
-        return [c.r, c.g, c.b];
-      });
+      program.uniforms.uColorStops.value = stops.map(getParsedColor);
+
       renderer.render({ scene: mesh });
     };
-    animateId = requestAnimationFrame(update);
 
+    animateId = requestAnimationFrame(update);
     resize();
 
     return () => {

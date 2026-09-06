@@ -189,8 +189,7 @@ const DriftWall = ({
           y: (e.clientY - rect.top) / rect.height - 0.5
         };
       }
-      const hit = document.elementFromPoint(e.clientX, e.clientY);
-      const tile = hit && hit.closest ? hit.closest('[data-tile-id]') : null;
+      const tile = e.target && e.target.closest ? e.target.closest('[data-tile-id]') : null;
       if (!tile) return;
       const id = tile.dataset.tileId;
       if (id === activeIdRef.current) return;

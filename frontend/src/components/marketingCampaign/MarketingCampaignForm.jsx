@@ -10,6 +10,12 @@ const MarketingCampaignFormContent = ({ campaign, onSuccess }) => {
 
   const [name, setName] = useState(campaign?.title || campaign?.name || '');
   const [platform, setPlatform] = useState(campaign?.platform || campaign?.platformType || '');
+  const [description, setDescription] = useState(campaign?.description || '');
+  const [budget, setBudget] = useState(campaign?.budgetAllocation || campaign?.budget || 15000);
+  const [minEngagement, setMinEngagement] = useState(campaign?.minEngagement || 1.5);
+  const [startDate, setStartDate] = useState(campaign?.startDate || '2026-06-01');
+  const [endDate, setEndDate] = useState(campaign?.endDate || '2026-12-31');
+
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -45,6 +51,11 @@ const MarketingCampaignFormContent = ({ campaign, onSuccess }) => {
           if (data.platform || data.platformType || data.targetPlatform) {
             setPlatform(data.platform || data.platformType || data.targetPlatform);
           }
+          if (data.description) setDescription(data.description);
+          if (data.budgetAllocation || data.budget) setBudget(data.budgetAllocation || data.budget);
+          if (data.minEngagement) setMinEngagement(data.minEngagement);
+          if (data.startDate) setStartDate(data.startDate);
+          if (data.endDate) setEndDate(data.endDate);
         }
       } catch (e) {
         setError(e?.response?.data?.message || e?.message || 'Internal Server Error');
@@ -67,11 +78,16 @@ const MarketingCampaignFormContent = ({ campaign, onSuccess }) => {
       const payload = {
         title: name,
         name: name,
-        description: `${name} multi-channel marketing campaign`,
-        budgetAllocation: 15000,
-        budget: 15000,
+        description: description || `${name} multi-channel marketing campaign`,
+        budgetAllocation: Number(budget),
+        budget: Number(budget),
+        minEngagement: Number(minEngagement),
+        startDate,
+        endDate,
         platform: platform || 'INSTAGRAM',
-        platformType: platform || 'INSTAGRAM'
+        platformType: platform || 'INSTAGRAM',
+        targetPlatform: platform || 'INSTAGRAM',
+        status: campaign?.status || 'ACTIVE'
       };
 
       if (campaign?.id) {
@@ -102,8 +118,16 @@ const MarketingCampaignFormContent = ({ campaign, onSuccess }) => {
     color: '#f8fafc',
     fontSize: '0.9rem',
     outline: 'none',
-    marginBottom: '1.25rem',
+    marginBottom: '1rem',
     transition: 'border-color 0.15s ease'
+  };
+
+  const labelStyle = {
+    display: 'block',
+    fontSize: '0.85rem',
+    color: '#cbd5e1',
+    marginBottom: '0.35rem',
+    fontWeight: 500
   };
 
   return (
@@ -119,17 +143,17 @@ const MarketingCampaignFormContent = ({ campaign, onSuccess }) => {
             }}
           >
             <DecryptedText
-              text={campaign?.id ? 'Update Campaign Scope' : 'Provision Campaign'}
+              text={campaign?.id ? 'Adjust Active Marketing Campaign' : '+ Provision New Campaign'}
               speed={35}
             />
           </h3>
           <p style={{ color: '#94a3b8', fontSize: '0.85rem', margin: 0 }}>
-            Configure title and distribution channel parameters
+            Configure entity deployment parameters and target execution engine
           </p>
         </div>
 
-        <label style={{ display: 'block', fontSize: '0.85rem', color: '#cbd5e1', marginBottom: '0.35rem', fontWeight: 500 }}>
-          Campaign Title
+        <label style={labelStyle}>
+          Campaign Title Vector
         </label>
         {/* Strict test contract input */}
         <input
@@ -140,8 +164,47 @@ const MarketingCampaignFormContent = ({ campaign, onSuccess }) => {
           style={inputStyle}
         />
 
-        <label style={{ display: 'block', fontSize: '0.85rem', color: '#cbd5e1', marginBottom: '0.35rem', fontWeight: 500 }}>
-          Distribution Platform
+        <label style={labelStyle}>
+          Detailed Strategy Description
+        </label>
+        <input
+          placeholder="Enter campaign deployment strategy description"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          style={inputStyle}
+        />
+
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+          <div>
+            <label style={labelStyle}>
+              Budget Weight Allocation ($)
+            </label>
+            <input
+              type="number"
+              placeholder="15000"
+              value={budget}
+              onChange={(e) => setBudget(e.target.value)}
+              style={inputStyle}
+            />
+          </div>
+
+          <div>
+            <label style={labelStyle}>
+              Floor Engagement Score Requirement
+            </label>
+            <input
+              type="number"
+              step="0.1"
+              placeholder="1.5"
+              value={minEngagement}
+              onChange={(e) => setMinEngagement(e.target.value)}
+              style={inputStyle}
+            />
+          </div>
+        </div>
+
+        <label style={labelStyle}>
+          Target Execution Engine
         </label>
         {/* Strict test contract select */}
         <select
@@ -153,7 +216,7 @@ const MarketingCampaignFormContent = ({ campaign, onSuccess }) => {
             cursor: 'pointer'
           }}
         >
-          <option value="" style={{ background: '#0f172a' }}>Select platform</option>
+          <option value="" style={{ background: '#0f172a' }}>Select platform engine</option>
           <option value="YOUTUBE" style={{ background: '#0f172a' }}>YOUTUBE</option>
           <option value="INSTAGRAM" style={{ background: '#0f172a' }}>INSTAGRAM</option>
           <option value="TIKTOK" style={{ background: '#0f172a' }}>TIKTOK</option>
@@ -169,6 +232,32 @@ const MarketingCampaignFormContent = ({ campaign, onSuccess }) => {
           {platform}
         </div>
 
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+          <div>
+            <label style={labelStyle}>
+              Start Date Map (YYYY-MM-DD)
+            </label>
+            <input
+              type="date"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+              style={inputStyle}
+            />
+          </div>
+
+          <div>
+            <label style={labelStyle}>
+              End Date Map (YYYY-MM-DD)
+            </label>
+            <input
+              type="date"
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+              style={inputStyle}
+            />
+          </div>
+        </div>
+
         {/* Strict test contract button */}
         <button
           type="button"
@@ -179,19 +268,13 @@ const MarketingCampaignFormContent = ({ campaign, onSuccess }) => {
             marginTop: '0.5rem',
             padding: '0.75rem',
             borderRadius: '8px',
-            backgroundColor: '#2563eb',
+            background: 'linear-gradient(135deg, #a855f7 0%, #ec4899 100%)',
             color: '#ffffff',
-            border: '1px solid #3b82f6',
-            fontWeight: 600,
+            border: 'none',
+            fontWeight: 700,
             fontSize: '0.9rem',
             cursor: isSubmitting ? 'not-allowed' : 'pointer',
-            transition: 'background-color 0.15s ease'
-          }}
-          onMouseEnter={(e) => {
-            if (!isSubmitting) e.currentTarget.style.backgroundColor = '#1d4ed8';
-          }}
-          onMouseLeave={(e) => {
-            if (!isSubmitting) e.currentTarget.style.backgroundColor = '#2563eb';
+            boxShadow: '0 4px 15px rgba(168, 85, 247, 0.35)'
           }}
         >
           Commit

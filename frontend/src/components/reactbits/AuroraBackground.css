@@ -16,6 +16,9 @@
   pointer-events: none;
   z-index: 0;
   overflow: hidden;
+  transform: translateZ(0);
+  will-change: transform;
+  contain: strict;
 }
 
 .enterprise-vignette-overlay {

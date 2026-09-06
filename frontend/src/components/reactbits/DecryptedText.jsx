@@ -68,6 +68,7 @@ export const DecryptedText = ({
   };
 
   useEffect(() => {
+    setDisplayText(text);
     if (animateOn === 'view') {
       scramble();
     }

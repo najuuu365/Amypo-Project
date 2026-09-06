@@ -127,42 +127,42 @@ function Register() {
               letterSpacing: '-0.02em'
             }}
           >
-            <DecryptedText text="Create Credentials" speed={35} />
+            <DecryptedText text="Provision Access Platform" speed={35} />
           </h2>
           <p style={{ color: '#94a3b8', fontSize: '0.85rem', margin: 0 }}>
-            Join the SocialSift intelligence & creator network
+            Provision user credentials across SocialSift intelligence nodes
           </p>
         </div>
 
         <form onSubmit={handleSubmit} style={{ width: '100%' }}>
           <label htmlFor="username" style={labelStyle}>
-            Username
+            Account Username
           </label>
           <input
             id="username"
             type="text"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
-            placeholder="e.g. AlexMorgan"
+            placeholder="Enter handle identifier"
             required
             style={inputStyle}
           />
 
           <label htmlFor="email" style={labelStyle}>
-            Email Address
+            Security Email Address
           </label>
           <input
             id="email"
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder="alex@domain.com"
+            placeholder="name@company.com"
             required
             style={inputStyle}
           />
 
           <label htmlFor="password" style={labelStyle}>
-            Password
+            Cryptographic Password
           </label>
           <input
             id="password"
@@ -175,7 +175,7 @@ function Register() {
           />
 
           <label htmlFor="role" style={labelStyle}>
-            Platform Role
+            Domain Role Assignment
           </label>
           <select
             id="role"
@@ -187,55 +187,43 @@ function Register() {
               cursor: 'pointer'
             }}
           >
-            <option value="" style={{ background: '#0f172a', color: '#fff' }}>Select role</option>
+            <option value="" style={{ background: '#0f172a', color: '#fff' }}>Select role assignment</option>
             <option value="INFLUENCER" style={{ background: '#0f172a', color: '#fff' }}>INFLUENCER</option>
             <option value="BRAND_MANAGER" style={{ background: '#0f172a', color: '#fff' }}>BRAND_MANAGER</option>
             <option value="PLATFORM_ANALYST" style={{ background: '#0f172a', color: '#fff' }}>PLATFORM_ANALYST</option>
           </select>
 
-          {role === 'INFLUENCER' && (
-            <div
-              style={{
-                padding: '1.25rem',
-                borderRadius: '10px',
-                backgroundColor: 'rgba(10, 12, 20, 0.6)',
-                border: '1px solid rgba(255, 255, 255, 0.08)',
-                marginBottom: '1rem'
-              }}
-            >
-              <label htmlFor="primaryPlatform" style={labelStyle}>
-                Primary Target Platform
-              </label>
-              <select
-                id="primaryPlatform"
-                value={primaryPlatform}
-                onChange={(e) => setPrimaryPlatform(e.target.value)}
-                required
-                style={{
-                  ...inputStyle,
-                  cursor: 'pointer'
-                }}
-              >
-                <option value="" style={{ background: '#0f172a', color: '#fff' }}>Select platform</option>
-                <option value="INSTAGRAM" style={{ background: '#0f172a', color: '#fff' }}>INSTAGRAM</option>
-                <option value="YOUTUBE" style={{ background: '#0f172a', color: '#fff' }}>YOUTUBE</option>
-                <option value="TIKTOK" style={{ background: '#0f172a', color: '#fff' }}>TIKTOK</option>
-              </select>
+          <label htmlFor="primaryPlatform" style={labelStyle}>
+            Primary Target Platform
+          </label>
+          <select
+            id="primaryPlatform"
+            value={primaryPlatform}
+            onChange={(e) => setPrimaryPlatform(e.target.value)}
+            required
+            style={{
+              ...inputStyle,
+              cursor: 'pointer'
+            }}
+          >
+            <option value="" style={{ background: '#0f172a', color: '#fff' }}>Select primary platform</option>
+            <option value="INSTAGRAM" style={{ background: '#0f172a', color: '#fff' }}>INSTAGRAM</option>
+            <option value="YOUTUBE" style={{ background: '#0f172a', color: '#fff' }}>YOUTUBE</option>
+            <option value="TIKTOK" style={{ background: '#0f172a', color: '#fff' }}>TIKTOK</option>
+          </select>
 
-              <label htmlFor="nicheCategory" style={labelStyle}>
-                Industry Niche Category
-              </label>
-              <input
-                id="nicheCategory"
-                type="text"
-                value={nicheCategory}
-                onChange={(e) => setNicheCategory(e.target.value)}
-                placeholder="e.g. Consumer Tech, Fitness, Fashion"
-                required
-                style={{ ...inputStyle, marginBottom: 0 }}
-              />
-            </div>
-          )}
+          <label htmlFor="nicheCategory" style={labelStyle}>
+            Industry Niche Category
+          </label>
+          <input
+            id="nicheCategory"
+            type="text"
+            value={nicheCategory}
+            onChange={(e) => setNicheCategory(e.target.value)}
+            placeholder="e.g. Technology Review, Gaming Lifestyle"
+            required
+            style={inputStyle}
+          />
 
           {/* Strict test contract button with StarBorder */}
           <StarBorder
@@ -256,9 +244,8 @@ function Register() {
         </form>
 
         <div style={{ marginTop: '1.5rem', textAlign: 'center', fontSize: '0.85rem', color: '#64748b' }}>
-          Already registered?{' '}
           <Link to="/login" style={{ color: '#ec4899', fontWeight: 600, textDecoration: 'none' }}>
-            Login here
+            Existing Account? Authorize Session
           </Link>
         </div>
       </div>

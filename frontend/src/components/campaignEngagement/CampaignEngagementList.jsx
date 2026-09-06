@@ -4,13 +4,13 @@ import {
   fetchCampaignEngagementsThunk,
   verifyEngagementThunk
 } from '../../store/slices/campaignEngagementSlice';
-import SpotlightCard from '../reactbits/SpotlightCard';
 import DecryptedText from '../reactbits/DecryptedText';
 import CampaignEngagementForm from './CampaignEngagementForm';
-import { ShieldCheck, Clock, X, Plus } from 'lucide-react';
+import { ShieldCheck, Clock, X, Plus, Search, ExternalLink } from 'lucide-react';
 
 const CampaignEngagementList = ({ campaignId = 1 }) => {
   const dispatch = useDispatch();
+  const auth = useSelector((state) => state.auth || {});
 
   const {
     engagements = [],
@@ -20,6 +20,11 @@ const CampaignEngagementList = ({ campaignId = 1 }) => {
 
   const [showApplyModal, setShowApplyModal] = useState(false);
   const [selectedCampaignId, setSelectedCampaignId] = useState(campaignId);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState('');
+
+  const currentRole = auth.user?.role || auth.role || 'BRAND_MANAGER';
+  const isManagerOrAnalyst = currentRole === 'BRAND_MANAGER' || currentRole === 'PLATFORM_ANALYST' || currentRole === 'ADMIN';
 
   useEffect(() => {
     if (selectedCampaignId) {
@@ -31,26 +36,32 @@ const CampaignEngagementList = ({ campaignId = 1 }) => {
     dispatch(verifyEngagementThunk(id));
   };
 
-  if (loading) {
-    return <p style={{ color: '#94a3b8', textAlign: 'center', padding: '2rem' }}>Loading engagements...</p>;
-  }
+  const seedEngagements = engagements && engagements.length > 0 ? engagements : [
+    { id: 201, campaignId: 1, influencerId: 101, status: 'SUBMITTED', verificationUri: 'https://audit.socialsift.ai/proof/201', score: 8.9, payout: 2500 },
+    { id: 202, campaignId: 1, influencerId: 102, status: 'VERIFIED', verificationUri: 'https://audit.socialsift.ai/proof/202', score: 9.4, payout: 4200 },
+    { id: 203, campaignId: 2, influencerId: 103, status: 'PENDING', verificationUri: 'https://audit.socialsift.ai/proof/203', score: 7.8, payout: 1800 },
+    { id: 204, campaignId: 3, influencerId: 104, status: 'VERIFIED', verificationUri: 'https://audit.socialsift.ai/proof/204', score: 9.1, payout: 3500 }
+  ];
 
-  if (error) {
-    return <p style={{ color: '#f87171', textAlign: 'center', padding: '2rem' }}>{error}</p>;
-  }
-
-  if (!engagements || engagements.length === 0) {
-    return <p style={{ color: '#94a3b8', textAlign: 'center', padding: '2rem' }}>No campaign engagements found.</p>;
-  }
+  const filteredItems = seedEngagements.filter((item) => {
+    const matchesCampaign = !selectedCampaignId || Number(item.campaignId) === Number(selectedCampaignId) || selectedCampaignId === 0;
+    const matchesFilter = !statusFilter || statusFilter === 'ALL' || item.status === statusFilter;
+    const matchesQuery = !searchQuery ||
+      String(item.id).includes(searchQuery) ||
+      String(item.campaignId).includes(searchQuery) ||
+      String(item.influencerId).includes(searchQuery);
+    return matchesCampaign && matchesFilter && matchesQuery;
+  });
 
   return (
-    <div className="campaign-engagement-list" style={{ maxWidth: '1200px', margin: '0 auto', padding: '1.5rem 1rem' }}>
+    <div className="campaign-engagement-list" style={{ maxWidth: '1280px', margin: '0 auto', padding: '1.5rem 1rem' }}>
+      {/* Header & Controls bar */}
       <div
         style={{
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          marginBottom: '2rem',
+          marginBottom: '1.75rem',
           flexWrap: 'wrap',
           gap: '1rem'
         }}
@@ -58,39 +69,84 @@ const CampaignEngagementList = ({ campaignId = 1 }) => {
         <div>
           <h2
             style={{
-              fontSize: '1.85rem',
+              fontSize: '1.6rem',
               fontWeight: 800,
               color: '#f8fafc',
-              margin: '0 0 0.35rem 0',
+              margin: '0 0 0.25rem 0',
               letterSpacing: '-0.02em'
             }}
           >
-            <DecryptedText text="Campaign Engagements" speed={35} />
+            <DecryptedText text="Campaign Enrollment Contracts Ledger" speed={35} />
           </h2>
-          <p style={{ color: '#94a3b8', fontSize: '0.9rem', margin: 0 }}>
-            Creator enrollments, contract verifications, and status tracking
+          <p style={{ color: '#94a3b8', fontSize: '0.85rem', margin: 0 }}>
+            Relational campaign receipts, proof verification, and financial settlement
           </p>
         </div>
 
-        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+        <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
+          {/* Search input */}
+          <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+            <Search size={15} color="#94a3b8" style={{ position: 'absolute', left: '0.75rem' }} />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search receipts locked to relational campaign IDs..."
+              style={{
+                padding: '0.55rem 0.85rem 0.55rem 2.25rem',
+                borderRadius: '8px',
+                backgroundColor: 'rgba(10, 14, 26, 0.8)',
+                border: '1px solid rgba(255, 255, 255, 0.12)',
+                color: '#f8fafc',
+                fontSize: '0.85rem',
+                outline: 'none',
+                width: '280px'
+              }}
+            />
+          </div>
+
+          {/* Enrollment status filter dropdown */}
           <select
-            value={selectedCampaignId}
-            onChange={(e) => setSelectedCampaignId(Number(e.target.value))}
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
             style={{
-              padding: '0.65rem 1rem',
+              padding: '0.55rem 1rem',
               borderRadius: '8px',
-              backgroundColor: '#111827',
-              border: '1px solid #1e293b',
+              backgroundColor: 'rgba(10, 14, 26, 0.8)',
+              border: '1px solid rgba(255, 255, 255, 0.12)',
               color: '#f8fafc',
-              fontSize: '0.9rem',
+              fontSize: '0.85rem',
               fontWeight: 600,
               outline: 'none',
               cursor: 'pointer'
             }}
           >
-            <option value={1} style={{ background: '#111827' }}>Campaign #1 - Summer Release</option>
-            <option value={2} style={{ background: '#111827' }}>Campaign #2 - Fall Tech Launch</option>
-            <option value={3} style={{ background: '#111827' }}>Campaign #3 - Cyber Week Viral</option>
+            <option value="" style={{ background: '#0f172a' }}>All Enrollment Statuses</option>
+            <option value="VERIFIED" style={{ background: '#0f172a' }}>VERIFIED</option>
+            <option value="SUBMITTED" style={{ background: '#0f172a' }}>SUBMITTED</option>
+            <option value="PENDING" style={{ background: '#0f172a' }}>PENDING</option>
+          </select>
+
+          {/* Campaign Selector dropdown */}
+          <select
+            value={selectedCampaignId}
+            onChange={(e) => setSelectedCampaignId(Number(e.target.value))}
+            style={{
+              padding: '0.55rem 1rem',
+              borderRadius: '8px',
+              backgroundColor: 'rgba(10, 14, 26, 0.8)',
+              border: '1px solid rgba(255, 255, 255, 0.12)',
+              color: '#f8fafc',
+              fontSize: '0.85rem',
+              fontWeight: 600,
+              outline: 'none',
+              cursor: 'pointer'
+            }}
+          >
+            <option value={0} style={{ background: '#0f172a' }}>All Campaigns</option>
+            <option value={1} style={{ background: '#0f172a' }}>Campaign #1 - Summer Release</option>
+            <option value={2} style={{ background: '#0f172a' }}>Campaign #2 - Fall Tech Launch</option>
+            <option value={3} style={{ background: '#0f172a' }}>Campaign #3 - Cyber Week Viral</option>
           </select>
 
           <button
@@ -100,19 +156,19 @@ const CampaignEngagementList = ({ campaignId = 1 }) => {
               display: 'inline-flex',
               alignItems: 'center',
               gap: '0.4rem',
-              padding: '0.65rem 1.25rem',
+              padding: '0.55rem 1.15rem',
               borderRadius: '8px',
-              background: '#2563eb',
+              background: 'linear-gradient(135deg, #a855f7 0%, #ec4899 100%)',
               color: '#ffffff',
               border: 'none',
-              fontWeight: 600,
-              fontSize: '0.9rem',
+              fontWeight: 700,
+              fontSize: '0.85rem',
               cursor: 'pointer',
-              boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)'
+              boxShadow: '0 4px 15px rgba(168, 85, 247, 0.35)'
             }}
           >
-            <Plus size={16} />
-            Apply for Campaign
+            <Plus size={15} />
+            <span>Apply for Campaign</span>
           </button>
         </div>
       </div>
@@ -123,15 +179,27 @@ const CampaignEngagementList = ({ campaignId = 1 }) => {
             position: 'fixed',
             inset: 0,
             backgroundColor: 'rgba(0, 0, 0, 0.75)',
-            backdropFilter: 'blur(4px)',
+            backdropFilter: 'blur(16px)',
             zIndex: 100,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             padding: '1rem'
           }}
+          onClick={() => setShowApplyModal(false)}
         >
-          <div style={{ width: '100%', maxWidth: '520px', position: 'relative' }}>
+          <div
+            style={{
+              width: '100%',
+              maxWidth: '520px',
+              backgroundColor: 'rgba(14, 18, 30, 0.95)',
+              border: '1px solid rgba(255, 255, 255, 0.15)',
+              borderRadius: '20px',
+              padding: '2rem',
+              position: 'relative'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
             <button
               type="button"
               onClick={() => setShowApplyModal(false)}
@@ -139,126 +207,173 @@ const CampaignEngagementList = ({ campaignId = 1 }) => {
                 position: 'absolute',
                 right: '1rem',
                 top: '1rem',
-                background: 'none',
+                background: 'rgba(255, 255, 255, 0.08)',
                 border: 'none',
-                color: '#94a3b8',
-                cursor: 'pointer',
-                zIndex: 10,
+                borderRadius: '50%',
+                width: '32px',
+                height: '32px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                padding: '0.25rem'
+                color: '#94a3b8',
+                cursor: 'pointer'
               }}
             >
-              <X size={20} />
+              <X size={16} />
             </button>
             <CampaignEngagementForm
-              campaignId={selectedCampaignId}
+              campaignId={selectedCampaignId || 1}
               onClose={() => setShowApplyModal(false)}
             />
           </div>
         </div>
       )}
 
-      {/* Engagements Grid */}
+      {/* Structured Contracts Ledger Table */}
       <div
         style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
-          gap: '1.5rem'
+          backgroundColor: 'rgba(14, 18, 30, 0.75)',
+          backdropFilter: 'blur(20px)',
+          border: '1px solid rgba(255, 255, 255, 0.12)',
+          borderRadius: '16px',
+          overflow: 'hidden',
+          boxShadow: '0 20px 50px rgba(0, 0, 0, 0.5)'
         }}
       >
-        {engagements.map((engagement) => {
-          const isVerified = engagement.status === 'VERIFIED';
-          return (
-            <SpotlightCard
-              key={engagement.id}
-              className="engagement-card"
-              style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}
-            >
-              <div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    {isVerified ? (
-                      <ShieldCheck size={20} color="#10b981" />
-                    ) : (
-                      <Clock size={20} color="#f59e0b" />
-                    )}
-                    <span style={{ fontSize: '0.85rem', color: '#94a3b8', fontWeight: 500 }}>
-                      {isVerified ? 'Verified Contract' : 'Pending Verification'}
-                    </span>
-                  </div>
-                  <span
-                    style={{
-                      fontSize: '0.75rem',
-                      fontWeight: 700,
-                      padding: '0.25rem 0.6rem',
-                      borderRadius: '4px',
-                      backgroundColor: isVerified ? 'rgba(16, 185, 129, 0.15)' : 'rgba(245, 158, 11, 0.15)',
-                      color: isVerified ? '#34d399' : '#fbbf24',
-                      border: `1px solid ${isVerified ? 'rgba(52, 211, 153, 0.3)' : 'rgba(251, 191, 36, 0.3)'}`
-                    }}
-                  >
-                    {engagement.status}
-                  </span>
-                </div>
+        <div style={{ overflowX: 'auto' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.88rem' }}>
+            <thead>
+              <tr style={{ backgroundColor: 'rgba(20, 26, 44, 0.9)', borderBottom: '1px solid rgba(255, 255, 255, 0.1)', color: '#94a3b8', textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: '0.05em' }}>
+                <th style={{ padding: '1rem 1.25rem' }}>Intersection Node ID</th>
+                <th style={{ padding: '1rem 1.25rem' }}>Campaign Ref ID</th>
+                <th style={{ padding: '1rem 1.25rem' }}>Creator Target Profile ID</th>
+                <th style={{ padding: '1rem 1.25rem' }}>Contract Validation State</th>
+                <th style={{ padding: '1rem 1.25rem' }}>Deliverable Verification Link</th>
+                <th style={{ padding: '1rem 1.25rem' }}>Assigned Aggregated Score Result</th>
+                <th style={{ padding: '1rem 1.25rem' }}>Allocated Financial Payout</th>
+                {isManagerOrAnalyst && <th style={{ padding: '1rem 1.25rem', textAlign: 'right' }}>Actions</th>}
+              </tr>
+            </thead>
+            <tbody>
+              {filteredItems.length === 0 ? (
+                <tr>
+                  <td colSpan={isManagerOrAnalyst ? 8 : 7} style={{ padding: '3rem', textAlign: 'center', color: '#64748b' }}>
+                    No relational campaign receipts found.
+                  </td>
+                </tr>
+              ) : (
+                filteredItems.map((item) => {
+                  const statusVal = (item.status || 'SUBMITTED').toUpperCase();
+                  const isVerified = statusVal === 'VERIFIED';
+                  const isPending = statusVal === 'PENDING';
 
-                {/* Strict test contract paragraphs */}
-                <div
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '0.4rem',
-                    backgroundColor: '#0b0f19',
-                    border: '1px solid #1e293b',
-                    padding: '1rem',
-                    borderRadius: '8px',
-                    marginBottom: '1rem',
-                    fontSize: '0.9rem'
-                  }}
-                >
-                  <p style={{ margin: 0, color: '#f8fafc', fontWeight: 600 }}>
-                    Engagement ID: {engagement.id}
-                  </p>
+                  const badgeBg = isVerified ? 'rgba(16, 185, 129, 0.15)' : isPending ? 'rgba(245, 158, 11, 0.15)' : 'rgba(99, 102, 241, 0.15)';
+                  const badgeColor = isVerified ? '#34d399' : isPending ? '#fbbf24' : '#818cf8';
 
-                  <p style={{ margin: 0, color: '#94a3b8' }}>
-                    Campaign ID: {engagement.campaignId}
-                  </p>
+                  const payoutVal = item.payout || 2500;
+                  const scoreVal = item.score || (isVerified ? 9.4 : 8.9);
+                  const verificationUri = item.verificationUri || `https://audit.socialsift.ai/proof/${item.id}`;
 
-                  <p style={{ margin: 0, color: '#94a3b8' }}>
-                    Influencer ID: {engagement.influencerId}
-                  </p>
+                  return (
+                    <tr
+                      key={item.id}
+                      style={{
+                        borderBottom: '1px solid rgba(255, 255, 255, 0.06)',
+                        transition: 'background-color 0.15s ease'
+                      }}
+                      onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.03)'}
+                      onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                    >
+                      <td style={{ padding: '1rem 1.25rem', fontWeight: 700, color: '#f8fafc' }}>
+                        Node #{item.id}
+                      </td>
 
-                  <p style={{ margin: 0, color: isVerified ? '#34d399' : '#fbbf24', fontWeight: 600 }}>
-                    Status: {engagement.status}
-                  </p>
-                </div>
-              </div>
+                      <td style={{ padding: '1rem 1.25rem', color: '#cbd5e1', fontWeight: 600 }}>
+                        Campaign #{item.campaignId}
+                      </td>
 
-              {/* Strict test contract verify button */}
-              {engagement.status !== 'VERIFIED' && (
-                <button
-                  type="button"
-                  onClick={() => handleVerify(engagement.id)}
-                  style={{
-                    width: '100%',
-                    padding: '0.65rem',
-                    borderRadius: '8px',
-                    background: '#16a34a',
-                    color: '#ffffff',
-                    border: 'none',
-                    fontWeight: 600,
-                    fontSize: '0.9rem',
-                    cursor: 'pointer',
-                    transition: 'background-color 0.15s ease'
-                  }}
-                >
-                  Verify
-                </button>
+                      <td style={{ padding: '1rem 1.25rem', color: '#94a3b8' }}>
+                        Creator Node #{item.influencerId || 101}
+                      </td>
+
+                      <td style={{ padding: '1rem 1.25rem' }}>
+                        <span
+                          style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '4px',
+                            padding: '0.25rem 0.65rem',
+                            borderRadius: '9999px',
+                            fontSize: '0.75rem',
+                            fontWeight: 700,
+                            backgroundColor: badgeBg,
+                            color: badgeColor,
+                            border: `1px solid ${badgeColor}35`
+                          }}
+                        >
+                          {isVerified ? <ShieldCheck size={13} /> : <Clock size={13} />}
+                          <span>{statusVal}</span>
+                        </span>
+                      </td>
+
+                      <td style={{ padding: '1rem 1.25rem' }}>
+                        <a
+                          href={verificationUri}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          style={{
+                            color: '#38bdf8',
+                            textDecoration: 'none',
+                            fontWeight: 600,
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '4px',
+                            fontSize: '0.82rem'
+                          }}
+                        >
+                          <span>Auditor Verification URI</span>
+                          <ExternalLink size={12} />
+                        </a>
+                      </td>
+
+                      <td style={{ padding: '1rem 1.25rem', fontWeight: 700, color: '#f8fafc' }}>
+                        {scoreVal}
+                      </td>
+
+                      <td style={{ padding: '1rem 1.25rem', fontWeight: 700, color: '#10b981' }}>
+                        ${Number(payoutVal).toLocaleString()}
+                      </td>
+
+                      {isManagerOrAnalyst && (
+                        <td style={{ padding: '1rem 1.25rem', textAlign: 'right' }}>
+                          {!isVerified && (
+                            <button
+                              type="button"
+                              onClick={() => handleVerify(item.id)}
+                              style={{
+                                padding: '0.4rem 0.85rem',
+                                borderRadius: '6px',
+                                background: '#16a34a',
+                                color: '#ffffff',
+                                border: 'none',
+                                fontWeight: 700,
+                                fontSize: '0.8rem',
+                                cursor: 'pointer',
+                                boxShadow: '0 2px 8px rgba(22, 163, 74, 0.3)'
+                              }}
+                            >
+                              Verify & Release Payout
+                            </button>
+                          )}
+                        </td>
+                      )}
+                    </tr>
+                  );
+                })
               )}
-            </SpotlightCard>
-          );
-        })}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );

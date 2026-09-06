@@ -7,10 +7,11 @@ export const StatCards = () => {
   const stats = [
     {
       id: 1,
-      title: 'Active Campaigns',
-      value: 12,
+      title: 'Total Active Campaigns',
+      value: 4,
+      prefix: '',
       suffix: '',
-      change: '+24.5%',
+      change: '+33.3%',
       isPositive: true,
       Icon: Activity,
       iconColor: '#3b82f6',
@@ -18,34 +19,35 @@ export const StatCards = () => {
     },
     {
       id: 2,
-      title: 'Creator Network',
-      value: 1655,
-      suffix: '+',
-      change: '+18.2%',
+      title: 'System Deployable Budget',
+      value: 63500,
+      prefix: '$ ',
+      suffix: '',
+      change: '+$15,000',
       isPositive: true,
-      Icon: Users,
+      Icon: TrendingUp,
       iconColor: '#8b5cf6',
       iconBg: 'rgba(139, 92, 246, 0.1)'
     },
     {
       id: 3,
-      title: 'Aggregate Reach',
-      value: 4.8,
-      suffix: 'M',
-      decimals: 1,
-      change: '+32.0%',
+      title: 'Indexed Target Creator Reach',
+      value: 1655000,
+      prefix: '',
+      suffix: ' Reach',
+      change: '+24.5%',
       isPositive: true,
-      Icon: TrendingUp,
+      Icon: Users,
       iconColor: '#06b6d4',
       iconBg: 'rgba(6, 182, 212, 0.1)'
     },
     {
       id: 4,
-      title: 'Engagement Reliability',
-      value: 99.4,
-      suffix: '%',
-      decimals: 1,
-      change: '+2.1%',
+      title: 'Registered Profiles',
+      value: 4,
+      prefix: '',
+      suffix: '',
+      change: '+100%',
       isPositive: true,
       Icon: ShieldCheck,
       iconColor: '#10b981',
@@ -83,6 +85,7 @@ export const StatCards = () => {
                     fontVariantNumeric: 'tabular-nums'
                   }}
                 >
+                  {stat.prefix || ''}
                   <AnimatedCounter
                     target={stat.value}
                     suffix={stat.suffix}

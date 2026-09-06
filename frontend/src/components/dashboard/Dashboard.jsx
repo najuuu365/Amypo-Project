@@ -1,13 +1,17 @@
 import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
-import { Link } from 'react-router-dom';
+import { Link, useLocation, Navigate } from 'react-router-dom';
 import StatCards from './StatCards';
 import DomainChart from './DomainChart';
 import RecentActivity from './RecentActivity';
+import MarketingCampaignList from '../marketingCampaign/MarketingCampaignList';
+import InfluencerProfileList from '../influencerProfile/InfluencerProfileList';
+import CampaignEngagementList from '../campaignEngagement/CampaignEngagementList';
+import EngagementMetricLogList from '../engagementMetricLog/EngagementMetricLogList';
+import UserProfilePage from '../../pages/UserProfilePage';
 import {
   Bell,
   Settings,
-  ArrowUpRight,
   TrendingUp,
   Sparkles,
   ChevronDown,
@@ -99,7 +103,9 @@ const PROFILES = {
 };
 
 export const Dashboard = () => {
+  const location = useLocation();
   const auth = useSelector((state) => state.auth || {});
+
   const currentRole = auth.user?.role || auth.role || 'BRAND_MANAGER';
   const roleConfig = PROFILES[currentRole] || PROFILES.BRAND_MANAGER;
 
@@ -108,11 +114,15 @@ export const Dashboard = () => {
   const [chartTimeframe, setChartTimeframe] = useState('1Y');
   const [showDetailedAnalytics, setShowDetailedAnalytics] = useState(true);
 
+  if (!auth.isAuthenticated) {
+    return <Navigate to="/" replace />;
+  }
+
   // Role-exclusive sidebar links matching the Helios UI spec
   const getSidebarLinks = (role) => {
     if (role === 'BRAND_MANAGER') {
       return [
-        { to: '/dashboard', label: 'Dashboard', Icon: Compass, active: true },
+        { to: '/dashboard', label: 'Dashboard', Icon: Compass },
         { to: '/campaigns', label: 'Campaigns', Icon: Megaphone },
         { to: '/profiles', label: 'Influencers', Icon: Users },
         { to: '/engagements', label: 'Engagements', Icon: CheckCircle2 },
@@ -120,13 +130,13 @@ export const Dashboard = () => {
       ];
     } else if (role === 'INFLUENCER') {
       return [
-        { to: '/dashboard', label: 'Dashboard', Icon: Compass, active: true },
+        { to: '/dashboard', label: 'Dashboard', Icon: Compass },
         { to: '/profile', label: 'My Profile', Icon: Users },
         { to: '/engagements', label: 'Engagements', Icon: CheckCircle2 }
       ];
     } else if (role === 'PLATFORM_ANALYST') {
       return [
-        { to: '/dashboard', label: 'Dashboard', Icon: Compass, active: true },
+        { to: '/dashboard', label: 'Dashboard', Icon: Compass },
         { to: '/metrics', label: 'Metrics Audit', Icon: ShieldAlert },
         { to: '/profiles', label: 'Influencers', Icon: Users },
         { to: '/campaigns', label: 'Campaigns', Icon: Megaphone },
@@ -134,14 +144,19 @@ export const Dashboard = () => {
       ];
     }
     return [
-      { to: '/dashboard', label: 'Dashboard', Icon: Compass, active: true },
+      { to: '/dashboard', label: 'Dashboard', Icon: Compass },
       { to: '/campaigns', label: 'Campaigns', Icon: Megaphone },
       { to: '/profiles', label: 'Influencers', Icon: Users },
       { to: '/profile', label: 'My Profile', Icon: Users }
     ];
   };
 
-  const sidebarLinks = getSidebarLinks(currentRole);
+  const rawSidebarLinks = getSidebarLinks(currentRole);
+  const sidebarLinks = rawSidebarLinks.map((item) => ({
+    ...item,
+    active: location.pathname === item.to || (item.to === '/dashboard' && (location.pathname === '/' || location.pathname === '/dashboard'))
+  }));
+
   const userDisplayName = auth.user?.username && auth.user.username !== 'User' ? auth.user.username : roleConfig.name;
   const userDisplayEmail = auth.user?.email || roleConfig.email;
 
@@ -193,446 +208,510 @@ export const Dashboard = () => {
 
         {/* Right Main Content */}
         <div className="helios-main-content">
-          {/* Top Header matching Helios UI */}
-          <div className="helios-top-header">
-            <div className="helios-greeting">
-              <h1>
-                Welcome, <span className="helios-greeting-name">{roleConfig.name.split(' ')[0]}</span>
-              </h1>
-              <p>{roleConfig.welcomeSub}</p>
-            </div>
-
-            <div className="helios-top-controls">
-              {/* Notification Bell */}
-              <button className="helios-icon-btn" aria-label="Notifications" onClick={() => alert('All role notifications and alerts are up to date.')}>
-                <Bell size={18} />
-                <span className="helios-pulse-dot" />
-              </button>
-
-              {/* Settings Cog */}
-              <button className="helios-icon-btn" aria-label="Settings" onClick={() => alert(`Role: ${currentRole} | Tier: ${roleConfig.title}`)}>
-                <Settings size={18} />
-              </button>
-
-              {/* Profile Spec Chip linking directly to User's Own Profile */}
-              <Link to="/profile" className="helios-profile-chip" style={{ textDecoration: 'none' }} title={`View ${userDisplayName}'s Profile`}>
-                <img
-                  src={roleConfig.avatar}
-                  alt={userDisplayName}
-                  className="helios-avatar-img"
-                />
-                <div className="helios-profile-meta">
-                  <span className="helios-profile-name">{userDisplayName}</span>
-                  <span className="helios-profile-email">{userDisplayEmail}</span>
+          {location.pathname === '/campaigns' ? (
+            <MarketingCampaignList />
+          ) : location.pathname === '/profiles' ? (
+            <InfluencerProfileList />
+          ) : location.pathname === '/engagements' ? (
+            <CampaignEngagementList />
+          ) : location.pathname === '/metrics' ? (
+            <EngagementMetricLogList />
+          ) : location.pathname === '/profile' ? (
+            <UserProfilePage />
+          ) : (
+            <>
+              {/* Top Header matching Helios UI */}
+              <div className="helios-top-header">
+                <div className="helios-greeting">
+                  <h1>
+                    Welcome, <span className="helios-greeting-name">{roleConfig.name.split(' ')[0]}</span>
+                  </h1>
+                  <p>{roleConfig.welcomeSub}</p>
                 </div>
-              </Link>
-            </div>
-          </div>
 
-          {/* Sub-Pills & Search Bar Row */}
-          <div className="helios-sub-controls-row">
-            <div className="helios-sub-pills">
-              {roleConfig.subPills.map((pill) => (
-                <button
-                  key={pill}
-                  onClick={() => setActiveSubPill(pill)}
-                  className={`sub-pill-btn ${activeSubPill === pill ? 'active' : ''}`}
-                >
-                  {pill}
-                </button>
-              ))}
-            </div>
-
-            {/* Search: Ask helios.ai anything */}
-            <div className="helios-search-bar">
-              <Sparkles size={16} color="#d946ef" />
-              <input
-                type="text"
-                placeholder="Ask helios.ai anything"
-                aria-label="Ask helios.ai anything"
-              />
-            </div>
-          </div>
-
-        {/* Middle Row: 3 Columns Grid */}
-        <div className="helios-middle-grid">
-          {/* Column 1: Total Holding + Decisions Powered by Data */}
-          <div className="helios-holding-stack">
-            <div className="helios-card">
-              <div className="helios-card-header">
-                <span className="helios-card-title">{roleConfig.holdingTitle}</span>
-                <div className="helios-timeframe-dropdown">
-                  <span>6M</span>
-                  <ChevronDown size={13} />
-                </div>
-              </div>
-              <div className="helios-big-amount">{roleConfig.holdingAmount}</div>
-            </div>
-
-            <div className="helios-card decisions-card">
-              <div>
-                <h3 className="decisions-title">Decisions Powered by Data</h3>
-                <p className="decisions-desc">{roleConfig.decisionsText}</p>
-              </div>
-              <button className="explore-insights-btn">
-                <Sparkles size={14} />
-                <span>Explore AI Insights</span>
-              </button>
-            </div>
-          </div>
-
-          {/* Column 2: Watchlist */}
-          <div className="helios-card">
-            <div className="helios-card-header">
-              <span className="helios-card-title">Watchlist</span>
-              <div className="watchlist-filter-row">
-                {['Most Viewed', 'Gain', 'Lose'].map((f) => (
-                  <button
-                    key={f}
-                    onClick={() => setWatchlistFilter(f)}
-                    className={`watchlist-pill ${watchlistFilter === f ? 'active' : ''}`}
-                  >
-                    {f}
+                <div className="helios-top-controls">
+                  {/* Notification Bell */}
+                  <button className="helios-icon-btn" aria-label="Notifications" onClick={() => alert('All role notifications and alerts are up to date.')}>
+                    <Bell size={18} />
+                    <span className="helios-pulse-dot" />
                   </button>
-                ))}
-              </div>
-            </div>
 
-            <div className="watchlist-item-list">
-              {roleConfig.watchlist.map((item, idx) => (
-                <div key={idx} className="watchlist-row">
-                  <div className="watchlist-item-left">
-                    <div className="watchlist-logo-box">
-                      <TrendingUp size={16} />
+                  {/* Settings Cog */}
+                  <button className="helios-icon-btn" aria-label="Settings" onClick={() => alert(`Role: ${currentRole} | Tier: ${roleConfig.title}`)}>
+                    <Settings size={18} />
+                  </button>
+
+                  {/* Profile Spec Chip linking directly to User's Own Profile */}
+                  <Link to="/profile" className="helios-profile-chip" style={{ textDecoration: 'none' }} title={`View ${userDisplayName}'s Profile`}>
+                    <img
+                      src={roleConfig.avatar}
+                      alt={userDisplayName}
+                      className="helios-avatar-img"
+                    />
+                    <div className="helios-profile-meta">
+                      <span className="helios-profile-name">{userDisplayName}</span>
+                      <span className="helios-profile-email">{userDisplayEmail}</span>
                     </div>
+                  </Link>
+                </div>
+              </div>
+
+              {/* Sub-Pills & Search Bar Row */}
+              <div className="helios-sub-controls-row">
+                <div className="helios-sub-pills">
+                  {roleConfig.subPills.map((pill) => (
+                    <button
+                      key={pill}
+                      onClick={() => setActiveSubPill(pill)}
+                      className={`sub-pill-btn ${activeSubPill === pill ? 'active' : ''}`}
+                    >
+                      {pill}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Search: Ask helios.ai anything */}
+                <div className="helios-search-bar">
+                  <Sparkles size={16} color="#d946ef" />
+                  <input
+                    type="text"
+                    placeholder="Ask helios.ai anything"
+                    aria-label="Ask helios.ai anything"
+                  />
+                </div>
+              </div>
+
+              {/* Middle Row: 3 Columns Grid */}
+              <div className="helios-middle-grid">
+                {/* Column 1: Total Holding + Decisions Powered by Data */}
+                <div className="helios-holding-stack">
+                  <div className="helios-card">
+                    <div className="helios-card-header">
+                      <span className="helios-card-title">{roleConfig.holdingTitle}</span>
+                      <div className="helios-timeframe-dropdown">
+                        <span>6M</span>
+                        <ChevronDown size={13} />
+                      </div>
+                    </div>
+                    <div className="helios-big-amount">{roleConfig.holdingAmount}</div>
+                  </div>
+
+                  <div className="helios-card decisions-card">
                     <div>
-                      <span className="watchlist-item-name">{item.name}</span>
-                      <span className="watchlist-item-sub">{item.sub}</span>
+                      <h3 className="decisions-title">Decisions Powered by Data</h3>
+                      <p className="decisions-desc">{roleConfig.decisionsText}</p>
+                    </div>
+                    <button className="explore-insights-btn">
+                      <Sparkles size={14} />
+                      <span>Explore AI Insights</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Column 2: Watchlist */}
+                <div className="helios-card">
+                  <div className="helios-card-header">
+                    <span className="helios-card-title">Watchlist</span>
+                    <div className="watchlist-filter-row">
+                      {['Most Viewed', 'Gain', 'Lose'].map((f) => (
+                        <button
+                          key={f}
+                          onClick={() => setWatchlistFilter(f)}
+                          className={`watchlist-pill ${watchlistFilter === f ? 'active' : ''}`}
+                        >
+                          {f}
+                        </button>
+                      ))}
                     </div>
                   </div>
-                  <div className="watchlist-item-right">
-                    <span className="watchlist-item-price">{item.price}</span>
-                    <span className="watchlist-item-gain">{item.gain}</span>
+
+                  <div className="watchlist-items-list">
+                    {roleConfig.watchlist.map((item) => (
+                      <div key={item.name} className="watchlist-item">
+                        <div>
+                          <div className="watchlist-item-name">{item.name}</div>
+                          <div className="watchlist-item-sub">{item.sub}</div>
+                        </div>
+                        <div className="watchlist-item-price-stack">
+                          <span className="watchlist-item-price">{item.price}</span>
+                          <span className="watchlist-item-gain">{item.gain}</span>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
-              ))}
-            </div>
-          </div>
 
-          {/* Column 3: My Portfolio Grid */}
-          <div className="helios-card">
-            <div className="helios-card-header">
-              <span className="helios-card-title">
-                {currentRole === 'INFLUENCER'
-                  ? 'My Deliverables'
-                  : currentRole === 'PLATFORM_ANALYST'
-                  ? 'System Audit Feeds'
-                  : 'My Portfolio'}
-              </span>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.78rem', color: '#cbd5e1', cursor: 'pointer' }}>
-                <span>See all</span>
-                <ArrowUpRight size={13} />
+                {/* Column 3: Portfolio Graph */}
+                <div className="helios-card graph-card">
+                  <div className="helios-card-header">
+                    <span className="helios-card-title">Portfolio Performance</span>
+                    <div className="watchlist-filter-row">
+                      {['1D', '1W', '1M', '1Y', 'ALL'].map((tf) => (
+                        <button
+                          key={tf}
+                          onClick={() => setChartTimeframe(tf)}
+                          className={`watchlist-pill ${chartTimeframe === tf ? 'active' : ''}`}
+                        >
+                          {tf}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="portfolio-graph-container">
+                    <div className="graph-gradient-fill" />
+                    <svg className="graph-line-svg" viewBox="0 0 300 120" preserveAspectRatio="none">
+                      <path
+                        d="M 0 90 Q 50 20, 100 60 T 200 30 T 300 10 L 300 120 L 0 120 Z"
+                        fill="url(#purpleGradient)"
+                        opacity="0.35"
+                      />
+                      <path
+                        d="M 0 90 Q 50 20, 100 60 T 200 30 T 300 10"
+                        fill="none"
+                        stroke="#c084fc"
+                        strokeWidth="3.5"
+                        strokeLinecap="round"
+                      />
+                      <defs>
+                        <linearGradient id="purpleGradient" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stopColor="#a855f7" stopOpacity="0.8" />
+                          <stop offset="100%" stopColor="#a855f7" stopOpacity="0.0" />
+                        </linearGradient>
+                      </defs>
+                    </svg>
+
+                    <div className="graph-badge">
+                      <TrendingUp size={14} color="#10b981" />
+                      <span>+24.8% YTD</span>
+                    </div>
+                  </div>
+                </div>
               </div>
-            </div>
 
-            <div className="portfolio-assets-grid">
-              {roleConfig.portfolioAssets.map((asset, idx) => (
-                <div key={idx} className="portfolio-asset-box">
-                  <div className="asset-box-val">{asset.val}</div>
-                  <div className="asset-box-gain">{asset.gain}</div>
-                  <div className="asset-box-meta">
-                    <span className="asset-box-tag">{asset.symbol}</span>
-                    <span>{asset.units}</span>
+              {/* Bottom Row: Portfolio Assets Horizontal Cards */}
+              <div className="helios-bottom-row">
+                <div className="helios-card-header" style={{ marginBottom: '1rem' }}>
+                  <span className="helios-card-title">Active Portfolio Assets</span>
+                  <span className="portfolio-asset-count">{roleConfig.portfolioAssets.length} Allocated Units</span>
+                </div>
+
+                <div className="portfolio-assets-grid">
+                  {roleConfig.portfolioAssets.map((asset) => (
+                    <div key={asset.symbol} className="asset-pill-card">
+                      <div className="asset-pill-left">
+                        <div className="asset-symbol-avatar">{asset.symbol.slice(0, 2)}</div>
+                        <div>
+                          <div className="asset-symbol">{asset.symbol}</div>
+                          <div className="asset-units">{asset.units}</div>
+                        </div>
+                      </div>
+
+                      <div className="asset-pill-right">
+                        <span className="asset-val">{asset.val}</span>
+                        <span className="asset-gain">{asset.gain}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Quick Actions Row */}
+              <div className="helios-quick-actions-row">
+                {currentRole === 'BRAND_MANAGER' && (
+                  <>
+                    <Link
+                      to="/campaigns"
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.45rem',
+                        padding: '0.65rem 1.25rem',
+                        borderRadius: '9999px',
+                        backgroundColor: 'rgba(99, 102, 241, 0.25)',
+                        border: '1px solid rgba(99, 102, 241, 0.5)',
+                        color: '#ffffff',
+                        textDecoration: 'none',
+                        fontWeight: 600,
+                        fontSize: '0.88rem'
+                      }}
+                    >
+                      <Megaphone size={16} />
+                      <span>Manage Campaigns</span>
+                    </Link>
+                    <Link
+                      to="/profiles"
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.45rem',
+                        padding: '0.65rem 1.25rem',
+                        borderRadius: '9999px',
+                        backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                        border: '1px solid rgba(255, 255, 255, 0.1)',
+                        color: '#cbd5e1',
+                        textDecoration: 'none',
+                        fontWeight: 600,
+                        fontSize: '0.88rem'
+                      }}
+                    >
+                      <Users size={16} />
+                      <span>Browse Creator Profiles</span>
+                    </Link>
+                  </>
+                )}
+
+                {currentRole === 'INFLUENCER' && (
+                  <>
+                    <Link
+                      to="/profile"
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.45rem',
+                        padding: '0.65rem 1.25rem',
+                        borderRadius: '9999px',
+                        backgroundColor: 'rgba(236, 72, 153, 0.25)',
+                        border: '1px solid rgba(236, 72, 153, 0.5)',
+                        color: '#ffffff',
+                        textDecoration: 'none',
+                        fontWeight: 600,
+                        fontSize: '0.88rem'
+                      }}
+                    >
+                      <Users size={16} />
+                      <span>Manage My Creator Profile</span>
+                    </Link>
+                    <Link
+                      to="/engagements"
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.45rem',
+                        padding: '0.65rem 1.25rem',
+                        borderRadius: '9999px',
+                        backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                        border: '1px solid rgba(255, 255, 255, 0.1)',
+                        color: '#cbd5e1',
+                        textDecoration: 'none',
+                        fontWeight: 600,
+                        fontSize: '0.88rem'
+                      }}
+                    >
+                      <CheckCircle2 size={16} />
+                      <span>Submit Deliverable Proof</span>
+                    </Link>
+                  </>
+                )}
+
+                {currentRole === 'PLATFORM_ANALYST' && (
+                  <>
+                    <Link
+                      to="/metrics"
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.45rem',
+                        padding: '0.65rem 1.25rem',
+                        borderRadius: '9999px',
+                        backgroundColor: 'rgba(16, 185, 129, 0.25)',
+                        border: '1px solid rgba(16, 185, 129, 0.5)',
+                        color: '#ffffff',
+                        textDecoration: 'none',
+                        fontWeight: 600,
+                        fontSize: '0.88rem'
+                      }}
+                    >
+                      <ShieldCheck size={16} />
+                      <span>Audit Metric Logs</span>
+                    </Link>
+                    <Link
+                      to="/profiles"
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.45rem',
+                        padding: '0.65rem 1.25rem',
+                        borderRadius: '9999px',
+                        backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                        border: '1px solid rgba(255, 255, 255, 0.1)',
+                        color: '#cbd5e1',
+                        textDecoration: 'none',
+                        fontWeight: 600,
+                        fontSize: '0.88rem'
+                      }}
+                    >
+                      <Users size={16} />
+                      <span>Inspect Influencer Profiles</span>
+                    </Link>
+                    <Link
+                      to="/campaigns"
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.45rem',
+                        padding: '0.65rem 1.25rem',
+                        borderRadius: '9999px',
+                        backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                        border: '1px solid rgba(255, 255, 255, 0.1)',
+                        color: '#cbd5e1',
+                        textDecoration: 'none',
+                        fontWeight: 600,
+                        fontSize: '0.88rem'
+                      }}
+                    >
+                      <Megaphone size={16} />
+                      <span>Audit Marketing Campaigns</span>
+                    </Link>
+                  </>
+                )}
+
+                <button
+                  onClick={() => setShowDetailedAnalytics(!showDetailedAnalytics)}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.45rem',
+                    padding: '0.65rem 1.25rem',
+                    borderRadius: '9999px',
+                    backgroundColor: 'transparent',
+                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                    color: '#94a3b8',
+                    cursor: 'pointer',
+                    fontWeight: 600,
+                    fontSize: '0.88rem',
+                    marginLeft: 'auto'
+                  }}
+                >
+                  <Radio size={15} color="#818cf8" />
+                  <span>{showDetailedAnalytics ? 'Collapse Telemetry Grid' : 'Expand Telemetry Grid'}</span>
+                </button>
+              </div>
+
+              {/* Integrated Core Analytics & Visual Telemetry Modules */}
+              {showDetailedAnalytics && (
+                <div className="integrated-analytics-section">
+                  <StatCards />
+
+                  {/* Visual Telemetry Modules */}
+                  <div
+                    style={{
+                      display: 'grid',
+                      gridTemplateColumns: 'repeat(auto-fit, minmax(420px, 1fr))',
+                      gap: '1.25rem',
+                      marginBottom: '1.5rem'
+                    }}
+                  >
+                    {/* Module 1: Target Marketing Platform Distribution Breakdown */}
+                    <div
+                      style={{
+                        backgroundColor: 'rgba(14, 18, 30, 0.85)',
+                        border: '1px solid rgba(255, 255, 255, 0.1)',
+                        borderRadius: '18px',
+                        padding: '1.35rem'
+                      }}
+                    >
+                      <h3 style={{ fontSize: '1.05rem', fontWeight: 700, color: '#f8fafc', margin: '0 0 1.25rem 0', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <Sparkles size={16} color="#c084fc" />
+                        <span>Target Marketing Platform Distribution Breakdown</span>
+                      </h3>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                        <div>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', marginBottom: '0.35rem' }}>
+                            <span style={{ color: '#ec4899', fontWeight: 600 }}>INSTAGRAM</span>
+                            <span style={{ color: '#cbd5e1', fontWeight: 700 }}>45% ($28,575)</span>
+                          </div>
+                          <div style={{ height: '8px', width: '100%', backgroundColor: 'rgba(255, 255, 255, 0.06)', borderRadius: '4px', overflow: 'hidden' }}>
+                            <div style={{ width: '45%', height: '100%', background: 'linear-gradient(90deg, #ec4899 0%, #f43f5e 100%)', borderRadius: '4px' }} />
+                          </div>
+                        </div>
+
+                        <div>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', marginBottom: '0.35rem' }}>
+                            <span style={{ color: '#ef4444', fontWeight: 600 }}>YOUTUBE</span>
+                            <span style={{ color: '#cbd5e1', fontWeight: 700 }}>35% ($22,225)</span>
+                          </div>
+                          <div style={{ height: '8px', width: '100%', backgroundColor: 'rgba(255, 255, 255, 0.06)', borderRadius: '4px', overflow: 'hidden' }}>
+                            <div style={{ width: '35%', height: '100%', background: 'linear-gradient(90deg, #ef4444 0%, #f97316 100%)', borderRadius: '4px' }} />
+                          </div>
+                        </div>
+
+                        <div>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', marginBottom: '0.35rem' }}>
+                            <span style={{ color: '#06b6d4', fontWeight: 600 }}>TIKTOK</span>
+                            <span style={{ color: '#cbd5e1', fontWeight: 700 }}>20% ($12,700)</span>
+                          </div>
+                          <div style={{ height: '8px', width: '100%', backgroundColor: 'rgba(255, 255, 255, 0.06)', borderRadius: '4px', overflow: 'hidden' }}>
+                            <div style={{ width: '20%', height: '100%', background: 'linear-gradient(90deg, #06b6d4 0%, #3b82f6 100%)', borderRadius: '4px' }} />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Module 2: Chronological Application Timeline Triggers */}
+                    <div
+                      style={{
+                        backgroundColor: 'rgba(14, 18, 30, 0.85)',
+                        border: '1px solid rgba(255, 255, 255, 0.1)',
+                        borderRadius: '18px',
+                        padding: '1.35rem'
+                      }}
+                    >
+                      <h3 style={{ fontSize: '1.05rem', fontWeight: 700, color: '#f8fafc', margin: '0 0 1rem 0', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <Radio size={16} color="#10b981" />
+                        <span>Chronological Application Timeline Triggers</span>
+                      </h3>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                        {[
+                          { time: '10:42:15', name: 'Summer Release 2026', platform: 'INSTAGRAM', action: 'Lifecycle Trigger ACTIVE', color: '#ec4899' },
+                          { time: '09:18:04', name: 'Fall Tech Launch', platform: 'YOUTUBE', action: 'Parameter Log Verified (Floor: 1.5)', color: '#ef4444' },
+                          { time: '08:05:22', name: 'Cyber Week Viral Challenge', platform: 'TIKTOK', action: 'Contract Locked Node #203', color: '#06b6d4' },
+                          { time: '06:51:10', name: 'Eco-Living Brand Wave', platform: 'INSTAGRAM', action: 'Financial Payout Dispatched', color: '#10b981' }
+                        ].map((evt, idx) => (
+                          <div
+                            key={idx}
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                              padding: '0.6rem 0.85rem',
+                              backgroundColor: 'rgba(255, 255, 255, 0.03)',
+                              borderRadius: '10px',
+                              border: '1px solid rgba(255, 255, 255, 0.05)',
+                              fontSize: '0.8rem'
+                            }}
+                          >
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                              <span style={{ color: '#64748b', fontMonospace: 'true', fontSize: '0.75rem' }}>{evt.time}</span>
+                              <span style={{ fontWeight: 600, color: '#f8fafc' }}>{evt.name}</span>
+                            </div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                              <span style={{ color: evt.color, fontWeight: 700, fontSize: '0.72rem', padding: '0.15rem 0.45rem', backgroundColor: `${evt.color}15`, borderRadius: '4px', border: `1px solid ${evt.color}30` }}>
+                                {evt.platform}
+                              </span>
+                              <span style={{ color: '#94a3b8' }}>{evt.action}</span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div
+                    style={{
+                      display: 'grid',
+                      gridTemplateColumns: 'repeat(auto-fit, minmax(420px, 1fr))',
+                      gap: '1.25rem',
+                      marginBottom: '1.5rem'
+                    }}
+                  >
+                    <DomainChart />
+                    <RecentActivity />
                   </div>
                 </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Bottom Card: Portfolio Performance (Large Helios curve graph) */}
-        <div className="helios-performance-card">
-          <div className="performance-top-bar">
-            <div className="performance-title-block">
-              <h3>
-                {currentRole === 'INFLUENCER'
-                  ? 'Creator Growth & Revenue Performance'
-                  : currentRole === 'PLATFORM_ANALYST'
-                  ? 'System Telemetry & Fraud Shield Throughput'
-                  : 'Portfolio Performance'}
-              </h3>
-              <p>Audited daily metrics vs predictive projections</p>
-            </div>
-
-            <div className="perf-time-pills">
-              {['1D', '1W', '1M', '6M', '1Y'].map((t) => (
-                <button
-                  key={t}
-                  onClick={() => setChartTimeframe(t)}
-                  className={`perf-pill-btn ${chartTimeframe === t ? 'active' : ''}`}
-                >
-                  {t}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Performance Curve SVG with Tooltip */}
-          <div className="chart-svg-wrapper">
-            <svg viewBox="0 0 900 220" className="helios-curve-svg" preserveAspectRatio="none">
-              <defs>
-                <linearGradient id="heliosPinkGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                  <stop offset="0%" stopColor="#ec4899" stopOpacity="0.45" />
-                  <stop offset="55%" stopColor="#8b5cf6" stopOpacity="0.12" />
-                  <stop offset="100%" stopColor="#07070d" stopOpacity="0" />
-                </linearGradient>
-              </defs>
-
-              {/* Gradient fill underneath curve */}
-              <path
-                d="M 0 160 C 60 150, 110 60, 180 90 C 260 130, 320 70, 410 110 C 490 145, 560 30, 620 50 C 700 70, 770 125, 840 85 C 870 70, 900 110, 900 110 L 900 220 L 0 220 Z"
-                fill="url(#heliosPinkGradient)"
-              />
-
-              {/* Glowing pink stroke line */}
-              <path
-                d="M 0 160 C 60 150, 110 60, 180 90 C 260 130, 320 70, 410 110 C 490 145, 560 30, 620 50 C 700 70, 770 125, 840 85 C 870 70, 900 110, 900 110"
-                fill="none"
-                stroke="#f472b6"
-                strokeWidth="3.5"
-              />
-
-              {/* Marker ping dot at peak (620, 50) */}
-              <circle cx="620" cy="50" r="6" fill="#ffffff" filter="drop-shadow(0 0 10px #f472b6)" />
-              <circle cx="620" cy="50" r="13" fill="none" stroke="#f472b6" strokeWidth="2" opacity="0.6" />
-            </svg>
-
-            {/* Tooltip bubble matching attached image */}
-            <div className="chart-tooltip-bubble">
-              <span className="tooltip-date-text">1st Jun 2026</span>
-              <span className="tooltip-val-text">
-                <span>$ 16,500</span>
-                <span className="tooltip-badge-gain">+35%</span>
-              </span>
-            </div>
-          </div>
-
-          {/* Months Axis (Jan - Dec) */}
-          <div className="chart-months-axis">
-            {['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'].map((m) => (
-              <span key={m} className="month-label">{m}</span>
-            ))}
-          </div>
-        </div>
-
-        {/* Role-Specific Quick Actions */}
-        <div style={{ marginTop: '2rem', display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-          {currentRole === 'BRAND_MANAGER' && (
-            <>
-              <Link
-                to="/campaigns"
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.45rem',
-                  padding: '0.65rem 1.25rem',
-                  borderRadius: '9999px',
-                  backgroundColor: 'rgba(99, 102, 241, 0.25)',
-                  border: '1px solid rgba(99, 102, 241, 0.5)',
-                  color: '#ffffff',
-                  textDecoration: 'none',
-                  fontWeight: 600,
-                  fontSize: '0.88rem'
-                }}
-              >
-                <Megaphone size={16} />
-                <span>Manage Campaigns</span>
-              </Link>
-              <Link
-                to="/profiles"
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.45rem',
-                  padding: '0.65rem 1.25rem',
-                  borderRadius: '9999px',
-                  backgroundColor: 'rgba(255, 255, 255, 0.05)',
-                  border: '1px solid rgba(255, 255, 255, 0.1)',
-                  color: '#cbd5e1',
-                  textDecoration: 'none',
-                  fontWeight: 600,
-                  fontSize: '0.88rem'
-                }}
-              >
-                <Users size={16} />
-                <span>Influencer Directory</span>
-              </Link>
-              <Link
-                to="/engagements"
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.45rem',
-                  padding: '0.65rem 1.25rem',
-                  borderRadius: '9999px',
-                  backgroundColor: 'rgba(255, 255, 255, 0.05)',
-                  border: '1px solid rgba(255, 255, 255, 0.1)',
-                  color: '#cbd5e1',
-                  textDecoration: 'none',
-                  fontWeight: 600,
-                  fontSize: '0.88rem'
-                }}
-              >
-                <CheckCircle2 size={16} />
-                <span>Verify Deliverables</span>
-              </Link>
+              )}
             </>
           )}
-
-          {currentRole === 'INFLUENCER' && (
-            <>
-              <Link
-                to="/profiles"
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.45rem',
-                  padding: '0.65rem 1.25rem',
-                  borderRadius: '9999px',
-                  backgroundColor: 'rgba(236, 72, 153, 0.25)',
-                  border: '1px solid rgba(236, 72, 153, 0.5)',
-                  color: '#ffffff',
-                  textDecoration: 'none',
-                  fontWeight: 600,
-                  fontSize: '0.88rem'
-                }}
-              >
-                <Users size={16} />
-                <span>Manage My Creator Profile</span>
-              </Link>
-              <Link
-                to="/engagements"
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.45rem',
-                  padding: '0.65rem 1.25rem',
-                  borderRadius: '9999px',
-                  backgroundColor: 'rgba(255, 255, 255, 0.05)',
-                  border: '1px solid rgba(255, 255, 255, 0.1)',
-                  color: '#cbd5e1',
-                  textDecoration: 'none',
-                  fontWeight: 600,
-                  fontSize: '0.88rem'
-                }}
-              >
-                <CheckCircle2 size={16} />
-                <span>Submit Deliverable Proof</span>
-              </Link>
-            </>
-          )}
-
-          {currentRole === 'PLATFORM_ANALYST' && (
-            <>
-              <Link
-                to="/metrics"
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.45rem',
-                  padding: '0.65rem 1.25rem',
-                  borderRadius: '9999px',
-                  backgroundColor: 'rgba(16, 185, 129, 0.25)',
-                  border: '1px solid rgba(16, 185, 129, 0.5)',
-                  color: '#ffffff',
-                  textDecoration: 'none',
-                  fontWeight: 600,
-                  fontSize: '0.88rem'
-                }}
-              >
-                <ShieldCheck size={16} />
-                <span>Audit Metric Logs</span>
-              </Link>
-              <Link
-                to="/profiles"
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.45rem',
-                  padding: '0.65rem 1.25rem',
-                  borderRadius: '9999px',
-                  backgroundColor: 'rgba(255, 255, 255, 0.05)',
-                  border: '1px solid rgba(255, 255, 255, 0.1)',
-                  color: '#cbd5e1',
-                  textDecoration: 'none',
-                  fontWeight: 600,
-                  fontSize: '0.88rem'
-                }}
-              >
-                <Users size={16} />
-                <span>Inspect Influencer Profiles</span>
-              </Link>
-              <Link
-                to="/campaigns"
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.45rem',
-                  padding: '0.65rem 1.25rem',
-                  borderRadius: '9999px',
-                  backgroundColor: 'rgba(255, 255, 255, 0.05)',
-                  border: '1px solid rgba(255, 255, 255, 0.1)',
-                  color: '#cbd5e1',
-                  textDecoration: 'none',
-                  fontWeight: 600,
-                  fontSize: '0.88rem'
-                }}
-              >
-                <Megaphone size={16} />
-                <span>Audit Marketing Campaigns</span>
-              </Link>
-            </>
-          )}
-
-          <button
-            onClick={() => setShowDetailedAnalytics(!showDetailedAnalytics)}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.45rem',
-              padding: '0.65rem 1.25rem',
-              borderRadius: '9999px',
-              backgroundColor: 'transparent',
-              border: '1px solid rgba(255, 255, 255, 0.1)',
-              color: '#94a3b8',
-              cursor: 'pointer',
-              fontWeight: 600,
-              fontSize: '0.88rem',
-              marginLeft: 'auto'
-            }}
-          >
-            <Radio size={15} color="#818cf8" />
-            <span>{showDetailedAnalytics ? 'Collapse Telemetry Grid' : 'Expand Telemetry Grid'}</span>
-          </button>
-        </div>
-
-        {/* Integrated Core Analytics (ensuring strict testcase contracts pass) */}
-        {showDetailedAnalytics && (
-          <div className="integrated-analytics-section">
-            <StatCards />
-            <div
-              style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(420px, 1fr))',
-                gap: '1.25rem',
-                marginBottom: '1.5rem'
-              }}
-            >
-              <DomainChart />
-              <RecentActivity />
-            </div>
-          </div>
-        )}
         </div>
       </div>
     </div>

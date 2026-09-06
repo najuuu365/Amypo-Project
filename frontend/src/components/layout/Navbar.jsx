@@ -1,18 +1,12 @@
 import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { logout } from '../../store/slices/authSlice';
 import {
-  LayoutDashboard,
-  Megaphone,
-  Users,
-  CheckCircle2,
-  ShieldAlert,
   LogOut,
   LogIn,
   UserPlus,
   Sparkles,
-  Compass,
   Bell,
   Settings,
   X,
@@ -23,6 +17,7 @@ import {
 import CircularText from '../reactbits/CircularText';
 import StarBorder from '../reactbits/StarBorder';
 import DecryptedText from '../reactbits/DecryptedText';
+import SafeWrapper from '../common/SafeWrapper';
 
 // Role profile specifications matching Helios Investments UI
 const ROLE_PROFILES = {
@@ -52,10 +47,8 @@ const ROLE_PROFILES = {
   }
 };
 
-import SafeWrapper from '../common/SafeWrapper';
-
 function NavbarContent() {
-  const location = useLocation();
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const auth = useSelector((state) => state.auth || {});
   const user = auth.user;
@@ -64,50 +57,16 @@ function NavbarContent() {
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
 
-  // Role-exclusive tabs allowing each user to view their own profile
-  const getNavLinks = (role, isAuthenticated) => {
-    if (!isAuthenticated) {
-      return [{ to: '/', label: 'Home', Icon: LayoutDashboard }];
-    }
-
-    if (role === 'BRAND_MANAGER') {
-      return [
-        { to: '/dashboard', label: 'Dashboard', Icon: Compass },
-        { to: '/campaigns', label: 'Campaigns', Icon: Megaphone },
-        { to: '/profiles', label: 'Influencers', Icon: Users },
-        { to: '/engagements', label: 'Engagements', Icon: CheckCircle2 },
-        { to: '/profile', label: 'My Profile', Icon: User }
-      ];
-    } else if (role === 'INFLUENCER') {
-      return [
-        { to: '/dashboard', label: 'Dashboard', Icon: Compass },
-        { to: '/profile', label: 'My Profile', Icon: User },
-        { to: '/engagements', label: 'Engagements', Icon: CheckCircle2 }
-      ];
-    } else if (role === 'PLATFORM_ANALYST') {
-      return [
-        { to: '/dashboard', label: 'Dashboard', Icon: Compass },
-        { to: '/metrics', label: 'Metrics Audit', Icon: ShieldAlert },
-        { to: '/profiles', label: 'Influencers', Icon: Users },
-        { to: '/campaigns', label: 'Campaigns', Icon: Megaphone },
-        { to: '/profile', label: 'My Profile', Icon: User }
-      ];
-    }
-
-    return [
-      { to: '/dashboard', label: 'Dashboard', Icon: Compass },
-      { to: '/campaigns', label: 'Campaigns', Icon: Megaphone },
-      { to: '/profiles', label: 'Influencers', Icon: Users },
-      { to: '/profile', label: 'My Profile', Icon: User }
-    ];
-  };
-
-  const navLinks = getNavLinks(currentRole, auth.isAuthenticated);
   const activeProfile = ROLE_PROFILES[currentRole] || ROLE_PROFILES.BRAND_MANAGER;
   const displayName = user?.username && user.username !== 'User' && user.username !== 'SocialSift Admin'
     ? user.username
     : activeProfile.name;
   const displayEmail = user?.email || auth.email || activeProfile.email;
+
+  const handleLogout = () => {
+    dispatch(logout());
+    navigate('/');
+  };
 
   return (
     <>
@@ -203,38 +162,6 @@ function NavbarContent() {
               </span>
             </div>
           </Link>
-
-          {/* Role-Exclusive Navigation Links */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
-            {navLinks.map((link) => {
-              const isActive = location.pathname === link.to;
-              const IconComponent = link.Icon;
-              return (
-                <Link
-                  key={link.to}
-                  to={link.to}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.45rem',
-                    padding: '0.45rem 0.95rem',
-                    borderRadius: '9999px',
-                    fontSize: '0.85rem',
-                    fontWeight: 600,
-                    textDecoration: 'none',
-                    color: isActive ? '#ffffff' : '#94a3b8',
-                    backgroundColor: isActive ? 'rgba(99, 102, 241, 0.22)' : 'transparent',
-                    border: isActive ? '1px solid rgba(99, 102, 241, 0.45)' : '1px solid transparent',
-                    boxShadow: isActive ? '0 0 16px rgba(99, 102, 241, 0.25)' : 'none',
-                    transition: 'all 0.2s ease'
-                  }}
-                >
-                  <IconComponent size={15} color={isActive ? '#818cf8' : '#94a3b8'} />
-                  <span>{link.label}</span>
-                </Link>
-              );
-            })}
-          </div>
         </div>
 
         {/* Right Controls */}
@@ -332,7 +259,7 @@ function NavbarContent() {
 
               {/* Logout Button */}
               <button
-                onClick={() => dispatch(logout())}
+                onClick={handleLogout}
                 style={{
                   display: 'flex',
                   alignItems: 'center',
@@ -553,7 +480,7 @@ function NavbarContent() {
               <button
                 onClick={() => {
                   setShowProfileModal(false);
-                  dispatch(logout());
+                  handleLogout();
                 }}
                 style={{
                   padding: '0.75rem 1.15rem',

@@ -55,18 +55,18 @@ export const InfluencerProfileForm = ({ profile, onClose }) => {
     <SpotlightCard style={{ padding: '2rem', backgroundColor: '#111827', border: '1px solid #1e293b' }}>
       <div style={{ marginBottom: '1.5rem' }}>
         <h3 style={{ fontSize: '1.35rem', fontWeight: 700, color: '#f8fafc', margin: '0 0 0.25rem 0' }}>
-          <DecryptedText text={profile ? 'Update Influencer Profile' : 'Register Influencer Profile'} speed={35} />
+          <DecryptedText text={profile ? 'Update Entity Metadata Profile' : '+ Register New Creator'} speed={35} />
         </h3>
         <p style={{ color: '#94a3b8', fontSize: '0.85rem', margin: 0 }}>
-          Manage creator attributes and platform metrics
+          Manage creator entity metadata and follower scale parameters
         </p>
       </div>
 
       <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column' }}>
-        <label style={labelStyle}>Social Handle Identifier</label>
+        <label style={labelStyle}>Social Handle Map</label>
         <input
           type="text"
-          placeholder="@creator_handle"
+          placeholder="@TechRaveOfficials"
           value={socialHandle}
           onChange={(e) => setSocialHandle(e.target.value)}
           required
@@ -75,7 +75,7 @@ export const InfluencerProfileForm = ({ profile, onClose }) => {
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
           <div>
-            <label style={labelStyle}>Primary Platform</label>
+            <label style={labelStyle}>Primary Target Platform</label>
             <select
               value={primaryPlatform}
               onChange={(e) => setPrimaryPlatform(e.target.value)}
@@ -88,10 +88,10 @@ export const InfluencerProfileForm = ({ profile, onClose }) => {
           </div>
 
           <div>
-            <label style={labelStyle}>Industry Niche</label>
+            <label style={labelStyle}>Industry Niche Category</label>
             <input
               type="text"
-              placeholder="e.g. Consumer Tech"
+              placeholder="e.g. Technology Review"
               value={nicheCategory}
               onChange={(e) => setNicheCategory(e.target.value)}
               required
@@ -102,7 +102,7 @@ export const InfluencerProfileForm = ({ profile, onClose }) => {
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
           <div>
-            <label style={labelStyle}>Follower Count</label>
+            <label style={labelStyle}>Base Follower Scale Count</label>
             <input
               type="number"
               value={baseFollowerCount}
@@ -112,7 +112,7 @@ export const InfluencerProfileForm = ({ profile, onClose }) => {
           </div>
 
           <div>
-            <label style={labelStyle}>Engagement Score (1-10)</label>
+            <label style={labelStyle}>Dynamic Engagement Benchmark</label>
             <input
               type="number"
               step="0.1"
@@ -130,18 +130,16 @@ export const InfluencerProfileForm = ({ profile, onClose }) => {
             marginTop: '0.5rem',
             padding: '0.75rem',
             borderRadius: '8px',
-            backgroundColor: '#2563eb',
+            background: 'linear-gradient(135deg, #a855f7 0%, #ec4899 100%)',
             color: '#ffffff',
-            border: '1px solid #3b82f6',
-            fontWeight: 600,
+            border: 'none',
+            fontWeight: 700,
             fontSize: '0.9rem',
             cursor: 'pointer',
-            transition: 'background-color 0.15s ease'
+            boxShadow: '0 4px 15px rgba(168, 85, 247, 0.35)'
           }}
-          onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#1d4ed8')}
-          onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#2563eb')}
         >
-          Save Creator Profile
+          Commit Entity Modifications
         </button>
       </form>
     </SpotlightCard>

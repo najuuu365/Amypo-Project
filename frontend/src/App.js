@@ -8,11 +8,6 @@ import ErrorHandler from './components/ErrorHandler';
 import NotificationStack from './components/NotificationStack';
 import AuroraBackground from './components/reactbits/AuroraBackground';
 import Dashboard from './components/dashboard/Dashboard';
-import ManageMarketingCampaigns from './pages/ManageMarketingCampaigns';
-import ManageInfluencerProfile from './pages/ManageInfluencerProfile';
-import UserProfilePage from './pages/UserProfilePage';
-import CampaignEngagementList from './components/campaignEngagement/CampaignEngagementList';
-import EngagementMetricLogList from './components/engagementMetricLog/EngagementMetricLogList';
 import './App.css';
 
 function App() {
@@ -25,13 +20,13 @@ function App() {
             <Routes>
               <Route path="/" element={<HomePage />} />
               <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/profile" element={<UserProfilePage />} />
+              <Route path="/profile" element={<Dashboard />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
-              <Route path="/campaigns" element={<ManageMarketingCampaigns />} />
-              <Route path="/profiles" element={<ManageInfluencerProfile />} />
-              <Route path="/engagements" element={<CampaignEngagementList />} />
-              <Route path="/metrics" element={<EngagementMetricLogList />} />
+              <Route path="/campaigns" element={<Dashboard />} />
+              <Route path="/profiles" element={<Dashboard />} />
+              <Route path="/engagements" element={<Dashboard />} />
+              <Route path="/metrics" element={<Dashboard />} />
             </Routes>
           </main>
           <NotificationStack />
