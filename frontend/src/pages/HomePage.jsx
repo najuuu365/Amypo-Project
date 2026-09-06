@@ -195,7 +195,7 @@ export default function HomePage() {
                   <div className="mini-logo-box">
                     <Sparkles size={14} color="#fff" />
                   </div>
-                  <span>Helios Sift</span>
+                  <span>SocialSift</span>
                 </div>
 
                 <div className="sidebar-pill active">

@@ -4,7 +4,7 @@ import campaignService from '../../services/marketingCampaignService';
 import DecryptedText from '../reactbits/DecryptedText';
 import MarketingCampaignForm from './MarketingCampaignForm';
 import SafeWrapper from '../common/SafeWrapper';
-import { X, Search, Plus, Edit2, Trash2, Megaphone } from 'lucide-react';
+import { X, Search, Plus, Edit2 } from 'lucide-react';
 
 const MarketingCampaignListContent = () => {
   const auth = useSelector((state) => state.auth || {});

@@ -21,10 +21,10 @@ import './UserProfilePage.css';
 const DEFAULT_PROFILES = {
   BRAND_MANAGER: {
     name: 'Nadia Rachel',
-    email: 'rachel_helios@gmail.com',
+    email: 'nadia.rachel@socialsift.com',
     avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=160&auto=format&fit=crop&q=80',
     title: 'Brand Marketing Director',
-    org: 'Helios Enterprise Brand Studio',
+    org: 'SocialSift Enterprise Brand Studio',
     accountTier: 'Enterprise Executive',
     joined: 'Jan 2025',
     metrics: [
@@ -36,7 +36,7 @@ const DEFAULT_PROFILES = {
   },
   INFLUENCER: {
     name: 'Alex Morgan',
-    email: 'alex_creator@helios.net',
+    email: 'alex.morgan@creators.io',
     avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=160&auto=format&fit=crop&q=80',
     title: 'Verified Influencer',
     org: 'Top 1% Consumer Tech & Lifestyle',
@@ -51,7 +51,7 @@ const DEFAULT_PROFILES = {
   },
   PLATFORM_ANALYST: {
     name: 'Marcus Vance',
-    email: 'marcus_analyst@helios.ai',
+    email: 'marcus.vance@audit.io',
     avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=160&auto=format&fit=crop&q=80',
     title: 'Platform Security Auditor',
     org: 'SocialSift Cyber Telemetry Team',

@@ -13,9 +13,7 @@ const InfluencerProfileList = ({ onEdit }) => {
   const auth = useSelector((state) => state.auth || {});
 
   const {
-    profiles = [],
-    loading,
-    error
+    profiles = []
   } = useSelector((state) => state.influencerProfile || {});
 
   const [editingProfile, setEditingProfile] = useState(null);

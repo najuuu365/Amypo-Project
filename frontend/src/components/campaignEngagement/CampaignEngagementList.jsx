@@ -13,9 +13,7 @@ const CampaignEngagementList = ({ campaignId = 1 }) => {
   const auth = useSelector((state) => state.auth || {});
 
   const {
-    engagements = [],
-    loading,
-    error
+    engagements = []
   } = useSelector((state) => state.campaignEngagement || {});
 
   const [showApplyModal, setShowApplyModal] = useState(false);
