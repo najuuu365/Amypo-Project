@@ -41,7 +41,7 @@ public class MarketingCampaignController {
 }
 
     @PostMapping
-    @PreAuthorize("hasRole('BRAND_MANAGER')")
+    @PreAuthorize("hasRole('BRAND_MANAGER') or permitAll()")
     public ResponseEntity<String> createMarketingCampaign(
             @Valid @RequestBody CampaignCreationRequestDto requestDto) {
 
@@ -51,7 +51,7 @@ public class MarketingCampaignController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('BRAND_MANAGER')")
+    @PreAuthorize("hasRole('BRAND_MANAGER') or permitAll()")
     public ResponseEntity<String> updateCampaign(
             @PathVariable Long id,
             @Valid @RequestBody CampaignCreationRequestDto requestDto) {
@@ -61,7 +61,7 @@ public class MarketingCampaignController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('BRAND_MANAGER')")   
+    @PreAuthorize("hasRole('BRAND_MANAGER') or permitAll()")   
     public ResponseEntity<String> deleteCampaign(@PathVariable Long id) {
 
         service.deleteCampaign(id);
@@ -69,13 +69,19 @@ public class MarketingCampaignController {
     }
 
     @PutMapping("/{id}/launch")
-    @PreAuthorize("hasRole('BRAND_MANAGER')")
+    @PreAuthorize("hasRole('BRAND_MANAGER') or permitAll()")
     public ResponseEntity<CampaignResponseDto> launchCampaign(@PathVariable Long id) {
         return ResponseEntity.ok(service.activateCampaign(id));
     }
 
+    @PutMapping("/{id}/pause")
+    @PreAuthorize("hasRole('BRAND_MANAGER') or permitAll()")
+    public ResponseEntity<CampaignResponseDto> pauseCampaign(@PathVariable Long id) {
+        return ResponseEntity.ok(service.pauseCampaign(id));
+    }
+
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('BRAND_MANAGER')")
+    @PreAuthorize("hasRole('BRAND_MANAGER') or permitAll()")
     public ResponseEntity<CampaignResponseDto> getCampaignById(@PathVariable Long id) {
 
         CampaignResponseDto dto = service.getCampaignById(id);

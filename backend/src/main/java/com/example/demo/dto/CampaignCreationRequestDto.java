@@ -3,6 +3,7 @@ package com.example.demo.dto;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+import com.example.demo.entity.CampaignStatus;
 import com.example.demo.entity.PlatformType;
 
 import jakarta.validation.constraints.NotBlank;
@@ -19,6 +20,7 @@ public class CampaignCreationRequestDto {
     private PlatformType platformType;
     private LocalDate startDate;
     private LocalDate endDate;
+    private CampaignStatus status;
     
     public CampaignCreationRequestDto() {
     }
@@ -70,6 +72,11 @@ public class CampaignCreationRequestDto {
         this.endDate = endDate;
     }
 
-    
+    public CampaignStatus getStatus() {
+        return status;
+    }
+    public void setStatus(CampaignStatus status) {
+        this.status = status;
+    }
 
 }

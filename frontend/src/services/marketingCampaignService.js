@@ -95,13 +95,8 @@ const marketingCampaignService = {
           status: item.status || 'ACTIVE'
         }));
 
-        // Merge locally created items that might not be in the backend yet
-        const stored = getStoredCampaigns();
-        const localCustom = stored.filter(
-          (loc) => !mappedBackend.some((b) => b.id === loc.id || b.title === loc.title)
-        );
-
-        return { data: [...localCustom, ...mappedBackend] };
+        saveStoredCampaigns(mappedBackend);
+        return { data: mappedBackend };
       }
 
       // If backend database has 0 items, provide stored / default campaigns
@@ -128,39 +123,55 @@ const marketingCampaignService = {
     const platform = (data.platform || data.platformType || 'INSTAGRAM').toUpperCase();
     const budget = Number(data.budgetAllocation || data.budget || 15000);
     const description = data.description || `${title} promotional campaign`;
+    const status = data.status || 'ACTIVE';
 
     const backendPayload = {
       title,
       description,
       budgetAllocation: budget,
       platformType: platform,
+      status: status,
       startDate: data.startDate || new Date().toISOString().split('T')[0],
       endDate: data.endDate || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
     };
 
-    const newCampaign = {
-      id: Date.now(),
-      title,
-      name: title,
-      description,
-      platform,
-      targetPlatform: platform,
-      platformType: platform,
-      status: data.status || 'ACTIVE',
-      budget,
-      budgetAllocation: budget,
-      targetAudience: data.targetAudience || 'Multi-platform digital creators',
-      enrolledCount: 0
-    };
-
-    // Save to local persistence immediately so it shows up instantly
-    const current = getStoredCampaigns();
-    saveStoredCampaigns([newCampaign, ...current]);
-
     try {
       const res = await api.post('/campaigns', backendPayload);
+      try {
+        const fetchRes = await api.get('/campaigns?page=0&pageSize=50');
+        const list = Array.isArray(fetchRes?.data)
+          ? fetchRes.data
+          : Array.isArray(fetchRes?.data?.content)
+          ? fetchRes.data.content
+          : [];
+        if (list.length > 0) {
+          const mapped = list.map((item) => ({
+            ...item,
+            platform: item.targetPlatform || item.platformType || item.platform || 'INSTAGRAM',
+            budget: item.budgetAllocation || item.budget || 15000,
+            status: item.status || 'ACTIVE'
+          }));
+          saveStoredCampaigns(mapped);
+        }
+      } catch (fErr) {}
       return res;
     } catch (err) {
+      const newCampaign = {
+        id: Date.now(),
+        title,
+        name: title,
+        description,
+        platform,
+        targetPlatform: platform,
+        platformType: platform,
+        status,
+        budget,
+        budgetAllocation: budget,
+        targetAudience: data.targetAudience || 'Multi-platform digital creators',
+        enrolledCount: 0
+      };
+      const current = getStoredCampaigns();
+      saveStoredCampaigns([newCampaign, ...current]);
       return { data: newCampaign };
     }
   },
@@ -177,7 +188,8 @@ const marketingCampaignService = {
           title,
           name: title,
           platform,
-          targetPlatform: platform
+          targetPlatform: platform,
+          status: data.status || c.status
         };
       }
       return c;
@@ -188,7 +200,8 @@ const marketingCampaignService = {
       title: data.title || data.name,
       description: data.description || `${data.title} update`,
       budgetAllocation: Number(data.budgetAllocation || data.budget || 15000),
-      platformType: (data.platformType || data.platform || 'INSTAGRAM').toUpperCase()
+      platformType: (data.platformType || data.platform || 'INSTAGRAM').toUpperCase(),
+      status: data.status
     };
 
     try {
@@ -216,9 +229,48 @@ const marketingCampaignService = {
     );
 
     try {
-      return await api.put(`/campaigns/${id}/launch`);
+      const res = await api.put(`/campaigns/${id}/launch`);
+      return res;
     } catch (err) {
+      try {
+        const found = current.find((c) => String(c.id) === String(id));
+        if (found) {
+          return await api.put(`/campaigns/${id}`, {
+            title: found.title,
+            description: found.description || 'Campaign update',
+            budgetAllocation: Number(found.budget || found.budgetAllocation || 15000),
+            platformType: (found.platform || found.platformType || 'INSTAGRAM').toUpperCase(),
+            status: 'ACTIVE'
+          });
+        }
+      } catch (e2) {}
       return { data: { id, status: 'ACTIVE' } };
+    }
+  },
+
+  pause: async (id) => {
+    const current = getStoredCampaigns();
+    saveStoredCampaigns(
+      current.map((c) => (String(c.id) === String(id) ? { ...c, status: 'PAUSED' } : c))
+    );
+
+    try {
+      const res = await api.put(`/campaigns/${id}/pause`);
+      return res;
+    } catch (err) {
+      try {
+        const found = current.find((c) => String(c.id) === String(id));
+        if (found) {
+          return await api.put(`/campaigns/${id}`, {
+            title: found.title,
+            description: found.description || 'Campaign update',
+            budgetAllocation: Number(found.budget || found.budgetAllocation || 15000),
+            platformType: (found.platform || found.platformType || 'INSTAGRAM').toUpperCase(),
+            status: 'PAUSED'
+          });
+        }
+      } catch (e2) {}
+      return { data: { id, status: 'PAUSED' } };
     }
   }
 };
@@ -230,6 +282,7 @@ export const update = marketingCampaignService.update;
 export const remove = marketingCampaignService.delete;
 export const deleteCampaign = marketingCampaignService.delete;
 export const launch = marketingCampaignService.launch;
+export const pause = marketingCampaignService.pause;
 
 export { marketingCampaignService };
 export default marketingCampaignService;

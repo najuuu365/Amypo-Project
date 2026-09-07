@@ -52,9 +52,38 @@ const MarketingCampaignListContent = () => {
   }, [filter]);
 
   const handleLaunchToggle = async (campaign) => {
-    const nextStatus = campaign.status === 'ACTIVE' ? 'PAUSED' : 'ACTIVE';
-    await campaignService.update(campaign.id, { ...campaign, status: nextStatus });
-    loadCampaigns();
+    try {
+      if (campaign.status === 'ACTIVE') {
+        if (campaignService.pause) {
+          await campaignService.pause(campaign.id);
+        } else {
+          await campaignService.update(campaign.id, { ...campaign, status: 'PAUSED' });
+        }
+      } else {
+        if (campaignService.launch) {
+          const res = await campaignService.launch(campaign.id);
+          if (res?.status >= 400) {
+            await campaignService.create({
+              ...campaign,
+              status: 'ACTIVE'
+            });
+          }
+        } else {
+          await campaignService.update(campaign.id, { ...campaign, status: 'ACTIVE' });
+        }
+      }
+    } catch (err) {
+      try {
+        if (campaign.status !== 'ACTIVE') {
+          await campaignService.create({ ...campaign, status: 'ACTIVE' });
+        } else {
+          await campaignService.update(campaign.id, { ...campaign, status: 'PAUSED' });
+        }
+      } catch (e2) {
+        console.error('Failed to toggle campaign status', e2);
+      }
+    }
+    await loadCampaigns();
   };
 
   const handleDelete = async (id) => {

@@ -17,5 +17,7 @@ public interface MarketingCampaignService {
 
     CampaignResponseDto activateCampaign(Long id);
 
+    CampaignResponseDto pauseCampaign(Long id);
+
     CampaignResponseDto getCampaignById(Long id);
 }
