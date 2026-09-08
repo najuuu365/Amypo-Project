@@ -6,7 +6,8 @@ import {
 } from '../../store/slices/campaignEngagementSlice';
 import DecryptedText from '../reactbits/DecryptedText';
 import CampaignEngagementForm from './CampaignEngagementForm';
-import { ShieldCheck, Clock, X, Plus, Search, ExternalLink } from 'lucide-react';
+import EngagementMetricLogForm from '../engagementMetricLog/EngagementMetricLogForm';
+import { ShieldCheck, Clock, X, Plus, Search, ExternalLink, Activity } from 'lucide-react';
 
 const CampaignEngagementList = ({ campaignId = 1 }) => {
   const dispatch = useDispatch();
@@ -17,6 +18,8 @@ const CampaignEngagementList = ({ campaignId = 1 }) => {
   } = useSelector((state) => state.campaignEngagement || {});
 
   const [showApplyModal, setShowApplyModal] = useState(false);
+  const [showTelemetryModal, setShowTelemetryModal] = useState(false);
+  const [telemetryEngagementId, setTelemetryEngagementId] = useState('205');
   const [selectedCampaignId, setSelectedCampaignId] = useState(campaignId);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
@@ -168,6 +171,30 @@ const CampaignEngagementList = ({ campaignId = 1 }) => {
             <Plus size={15} />
             <span>Apply for Campaign</span>
           </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              setTelemetryEngagementId('205');
+              setShowTelemetryModal(true);
+            }}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.4rem',
+              padding: '0.55rem 1.15rem',
+              borderRadius: '8px',
+              background: 'rgba(255, 255, 255, 0.08)',
+              border: '1px solid rgba(255, 255, 255, 0.15)',
+              color: '#f8fafc',
+              fontWeight: 700,
+              fontSize: '0.85rem',
+              cursor: 'pointer'
+            }}
+          >
+            <Activity size={15} color="#a855f7" />
+            <span>Record Telemetry</span>
+          </button>
         </div>
       </div>
 
@@ -249,13 +276,13 @@ const CampaignEngagementList = ({ campaignId = 1 }) => {
                 <th style={{ padding: '1rem 1.25rem' }}>Deliverable Verification Link</th>
                 <th style={{ padding: '1rem 1.25rem' }}>Assigned Aggregated Score Result</th>
                 <th style={{ padding: '1rem 1.25rem' }}>Allocated Financial Payout</th>
-                {isManagerOrAnalyst && <th style={{ padding: '1rem 1.25rem', textAlign: 'right' }}>Actions</th>}
+                <th style={{ padding: '1rem 1.25rem', textAlign: 'right' }}>Actions</th>
               </tr>
             </thead>
             <tbody>
               {filteredItems.length === 0 ? (
                 <tr>
-                  <td colSpan={isManagerOrAnalyst ? 8 : 7} style={{ padding: '3rem', textAlign: 'center', color: '#64748b' }}>
+                  <td colSpan={8} style={{ padding: '3rem', textAlign: 'center', color: '#64748b' }}>
                     No relational campaign receipts found.
                   </td>
                 </tr>
@@ -342,29 +369,51 @@ const CampaignEngagementList = ({ campaignId = 1 }) => {
                         ${Number(payoutVal).toLocaleString()}
                       </td>
 
-                      {isManagerOrAnalyst && (
-                        <td style={{ padding: '1rem 1.25rem', textAlign: 'right' }}>
-                          {!isVerified && (
-                            <button
-                              type="button"
-                              onClick={() => handleVerify(item.id)}
-                              style={{
-                                padding: '0.4rem 0.85rem',
-                                borderRadius: '6px',
-                                background: '#16a34a',
-                                color: '#ffffff',
-                                border: 'none',
-                                fontWeight: 700,
-                                fontSize: '0.8rem',
-                                cursor: 'pointer',
-                                boxShadow: '0 2px 8px rgba(22, 163, 74, 0.3)'
-                              }}
-                            >
-                              Verify & Release Payout
-                            </button>
-                          )}
-                        </td>
-                      )}
+                      <td style={{ padding: '1rem 1.25rem', textAlign: 'right', whiteSpace: 'nowrap' }}>
+                        {isManagerOrAnalyst && !isVerified && (
+                          <button
+                            type="button"
+                            onClick={() => handleVerify(item.id)}
+                            style={{
+                              padding: '0.4rem 0.85rem',
+                              borderRadius: '6px',
+                              background: '#16a34a',
+                              color: '#ffffff',
+                              border: 'none',
+                              fontWeight: 700,
+                              fontSize: '0.8rem',
+                              cursor: 'pointer',
+                              boxShadow: '0 2px 8px rgba(22, 163, 74, 0.3)',
+                              marginRight: '0.5rem'
+                            }}
+                          >
+                            Verify & Release Payout
+                          </button>
+                        )}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setTelemetryEngagementId(String(item.id));
+                            setShowTelemetryModal(true);
+                          }}
+                          style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '4px',
+                            padding: '0.4rem 0.75rem',
+                            borderRadius: '6px',
+                            background: 'rgba(168, 85, 247, 0.15)',
+                            border: '1px solid rgba(168, 85, 247, 0.3)',
+                            color: '#c084fc',
+                            fontWeight: 700,
+                            fontSize: '0.8rem',
+                            cursor: 'pointer'
+                          }}
+                        >
+                          <Activity size={13} />
+                          <span>Record Telemetry</span>
+                        </button>
+                      </td>
                     </tr>
                   );
                 })
@@ -373,6 +422,60 @@ const CampaignEngagementList = ({ campaignId = 1 }) => {
           </table>
         </div>
       </div>
+
+      {/* Telemetry Metric Recording Modal */}
+      {showTelemetryModal && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.75)',
+            backdropFilter: 'blur(16px)',
+            zIndex: 100,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '1rem'
+          }}
+          onClick={() => setShowTelemetryModal(false)}
+        >
+          <div
+            style={{
+              width: '100%',
+              maxWidth: '540px',
+              position: 'relative'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              type="button"
+              onClick={() => setShowTelemetryModal(false)}
+              style={{
+                position: 'absolute',
+                right: '1rem',
+                top: '1rem',
+                background: 'rgba(255, 255, 255, 0.08)',
+                border: 'none',
+                borderRadius: '50%',
+                width: '32px',
+                height: '32px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#94a3b8',
+                cursor: 'pointer',
+                zIndex: 10
+              }}
+            >
+              <X size={16} />
+            </button>
+            <EngagementMetricLogForm
+              initialParentContractId={telemetryEngagementId}
+              onClose={() => setShowTelemetryModal(false)}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 };

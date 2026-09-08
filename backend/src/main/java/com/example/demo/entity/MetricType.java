@@ -6,5 +6,9 @@ public enum MetricType {
     COMMENTS,
     SHARES,
     CLICKS,
-    CONVERSIONS
+    CONVERSIONS,
+    CLICK_THROUGH,
+    BOT_INTERACTION,
+    ENGAGEMENT_SPIKE,
+    FOLLOWER_CHURN
 }

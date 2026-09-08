@@ -22,13 +22,13 @@ public class EngagementMetricLogController {
     @Autowired
     EngagementMetricLogService service;
 
-    @PreAuthorize("hasRole('PLATFORM_ANALYST')")
+    @PreAuthorize("hasAnyRole('PLATFORM_ANALYST', 'INFLUENCER')")
     @GetMapping("/suspicious")
     public ResponseEntity<List<MetricIngestRequestDto>> getSuspiciousMetrics() {
         return ResponseEntity.ok(service.getSuspiciousMetrics());
     }
 
-    @PreAuthorize("hasRole('PLATFORM_ANALYST')")
+    @PreAuthorize("hasAnyRole('PLATFORM_ANALYST', 'INFLUENCER')")
     @PostMapping("/record")
     public ResponseEntity<MetricIngestRequestDto> recordMetrics(@Valid @RequestBody MetricIngestRequestDto requestDto) {
         MetricIngestRequestDto responseDto = service.recordMetrics(requestDto);

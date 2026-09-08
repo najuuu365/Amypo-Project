@@ -13,6 +13,20 @@ export const fetchSuspiciousMetricsThunk = createAsyncThunk(
   }
 );
 
+export const recordMetricThunk = createAsyncThunk(
+  'engagementMetricLog/recordMetric',
+  async (metricData, { dispatch, rejectWithValue }) => {
+    try {
+      const res = await engagementMetricLogService.record(metricData);
+      const data = res?.data ?? res;
+      dispatch(fetchSuspiciousMetricsThunk());
+      return data;
+    } catch (err) {
+      return rejectWithValue(err?.response?.data?.message || err.message || 'Failed to record metric');
+    }
+  }
+);
+
 const initialState = {
   logs: [
     {
@@ -26,6 +40,7 @@ const initialState = {
       complianceStatus: 'COMPLIANT',
       metricType: 'CLICK_THROUGH',
       loggedValue: 98.4,
+      numericValue: 98.4,
       suspicionReason: 'Baseline engagement telemetry within expected metrics'
     },
     {
@@ -39,6 +54,7 @@ const initialState = {
       complianceStatus: 'FLAGGED',
       metricType: 'BOT_INTERACTION',
       loggedValue: 74.2,
+      numericValue: 74.2,
       suspicionReason: 'Abnormal CTR velocity detected across residential proxies'
     },
     {
@@ -52,6 +68,7 @@ const initialState = {
       complianceStatus: 'ANOMALY',
       metricType: 'ENGAGEMENT_SPIKE',
       loggedValue: 120.5,
+      numericValue: 120.5,
       suspicionReason: 'Automated burst script detected in short window'
     },
     {
@@ -65,6 +82,7 @@ const initialState = {
       complianceStatus: 'COMPLIANT',
       metricType: 'FOLLOWER_CHURN',
       loggedValue: 45.1,
+      numericValue: 45.1,
       suspicionReason: 'Verified organic interaction signature'
     }
   ],
@@ -75,7 +93,13 @@ const initialState = {
 const engagementMetricLogSlice = createSlice({
   name: 'engagementMetricLog',
   initialState,
-  reducers: {},
+  reducers: {
+    appendMetricLog: (state, action) => {
+      if (action.payload) {
+        state.logs = [action.payload, ...state.logs.filter((l) => String(l.id) !== String(action.payload.id))];
+      }
+    }
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchSuspiciousMetricsThunk.pending, (state) => {
@@ -84,15 +108,31 @@ const engagementMetricLogSlice = createSlice({
       })
       .addCase(fetchSuspiciousMetricsThunk.fulfilled, (state, action) => {
         state.loading = false;
-        if (Array.isArray(action.payload)) {
+        if (Array.isArray(action.payload) && action.payload.length > 0) {
           state.logs = action.payload;
         }
       })
       .addCase(fetchSuspiciousMetricsThunk.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+      })
+      .addCase(recordMetricThunk.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(recordMetricThunk.fulfilled, (state, action) => {
+        state.loading = false;
+        if (action.payload) {
+          state.logs = [action.payload, ...state.logs.filter((l) => String(l.id) !== String(action.payload.id))];
+        }
+      })
+      .addCase(recordMetricThunk.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
       });
   }
 });
+
+export const { appendMetricLog } = engagementMetricLogSlice.actions;
 
 export default engagementMetricLogSlice.reducer;

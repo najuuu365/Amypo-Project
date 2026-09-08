@@ -1,15 +1,14 @@
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import engagementMetricLogService from '../../services/engagementMetricLogService';
-import { fetchSuspiciousMetricsThunk } from '../../store/slices/engagementMetricLogSlice';
+import { fetchSuspiciousMetricsThunk, recordMetricThunk } from '../../store/slices/engagementMetricLogSlice';
 import SpotlightCard from '../reactbits/SpotlightCard';
 import DecryptedText from '../reactbits/DecryptedText';
 import StarBorder from '../reactbits/StarBorder';
 import { ShieldCheck, Plus, Activity } from 'lucide-react';
 
-export const EngagementMetricLogForm = ({ onClose }) => {
+export const EngagementMetricLogForm = ({ onClose, initialParentContractId = '205' }) => {
   const dispatch = useDispatch();
-  const [parentContractId, setParentContractId] = useState('205');
+  const [parentContractId, setParentContractId] = useState(String(initialParentContractId || '205'));
   const [likesCount, setLikesCount] = useState(5000);
   const [commentsCount, setCommentsCount] = useState(1000);
   const [sharesCount, setSharesCount] = useState(1200);
@@ -19,6 +18,7 @@ export const EngagementMetricLogForm = ({ onClose }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const derivedRate = Number((((Number(likesCount) + Number(commentsCount) + Number(sharesCount)) / (Number(viewsCount) || 1)) * 100).toFixed(2));
     const newLog = {
       parentContractId: Number(parentContractId),
       engagementId: Number(parentContractId),
@@ -28,16 +28,17 @@ export const EngagementMetricLogForm = ({ onClose }) => {
       viewsCount: Number(viewsCount),
       complianceStatus,
       metricType: complianceStatus === 'ANOMALY' ? 'BOT_INTERACTION' : 'CLICK_THROUGH',
-      loggedValue: Number((((Number(likesCount) + Number(commentsCount) + Number(sharesCount)) / (Number(viewsCount) || 1)) * 100).toFixed(2)),
+      numericValue: derivedRate,
+      loggedValue: derivedRate,
       suspicionReason: `Log submitted with status: ${complianceStatus}`
     };
 
-    await engagementMetricLogService.record(newLog);
+    await dispatch(recordMetricThunk(newLog));
     dispatch(fetchSuspiciousMetricsThunk());
     setRecorded(true);
     setTimeout(() => {
       if (onClose) onClose();
-    }, 1000);
+    }, 800);
   };
 
   const inputStyle = {

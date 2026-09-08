@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Link, useLocation, Navigate } from 'react-router-dom';
 import StatCards from './StatCards';
@@ -12,6 +12,7 @@ import MarketingCampaignList from '../marketingCampaign/MarketingCampaignList';
 import InfluencerProfileList from '../influencerProfile/InfluencerProfileList';
 import CampaignEngagementList from '../campaignEngagement/CampaignEngagementList';
 import EngagementMetricLogList from '../engagementMetricLog/EngagementMetricLogList';
+import EngagementMetricLogForm from '../engagementMetricLog/EngagementMetricLogForm';
 import UserProfilePage from '../../pages/UserProfilePage';
 import {
   Bell,
@@ -23,7 +24,8 @@ import {
   Compass,
   LifeBuoy,
   Activity,
-  Plus
+  Plus,
+  X
 } from 'lucide-react';
 import './Dashboard.css';
 
@@ -58,6 +60,7 @@ const PROFILES = {
 export const Dashboard = () => {
   const location = useLocation();
   const auth = useSelector((state) => state.auth || {});
+  const [showTelemetryModal, setShowTelemetryModal] = useState(false);
 
   const currentRole = auth.user?.role || auth.role || 'BRAND_MANAGER';
   const roleConfig = PROFILES[currentRole] || PROFILES.BRAND_MANAGER;
@@ -79,8 +82,10 @@ export const Dashboard = () => {
     } else if (role === 'INFLUENCER') {
       return [
         { to: '/dashboard', label: 'Analytics Hub', Icon: Compass },
-        { to: '/profile', label: 'My Profile', Icon: Users },
-        { to: '/engagements', label: 'Deliverables', Icon: CheckCircle2 }
+        { to: '/campaigns', label: 'Campaigns', Icon: Megaphone },
+        { to: '/engagements', label: 'Deliverables', Icon: CheckCircle2 },
+        { to: '/metrics', label: 'Telemetry Metrics', Icon: Activity },
+        { to: '/profile', label: 'My Profile', Icon: Users }
       ];
     } else if (role === 'PLATFORM_ANALYST') {
       return [
@@ -204,6 +209,21 @@ export const Dashboard = () => {
                       <span>New Campaign</span>
                     </Link>
                   )}
+                  {currentRole === 'INFLUENCER' && (
+                    <button
+                      type="button"
+                      onClick={() => setShowTelemetryModal(true)}
+                      className="top-action-btn primary"
+                      style={{
+                        background: 'linear-gradient(135deg, #a855f7 0%, #ec4899 100%)',
+                        border: 'none',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      <Activity size={15} />
+                      <span>Record Telemetry</span>
+                    </button>
+                  )}
 
                   {/* Notification Bell */}
                   <button
@@ -258,14 +278,22 @@ export const Dashboard = () => {
               </div>
 
               {/* 3. Secondary Analytics Visual Row: Campaign Budget Bars + Domain Channel Share */}
-              <div className="analytics-secondary-grid">
-                <div className="analytics-secondary-col">
-                  <CampaignBudgetBars />
+              {currentRole !== 'INFLUENCER' ? (
+                <div className="analytics-secondary-grid">
+                  <div className="analytics-secondary-col">
+                    <CampaignBudgetBars />
+                  </div>
+                  <div className="analytics-secondary-col">
+                    <DomainChart />
+                  </div>
                 </div>
-                <div className="analytics-secondary-col">
-                  <DomainChart />
+              ) : (
+                <div className="analytics-secondary-grid" style={{ gridTemplateColumns: '1fr' }}>
+                  <div className="analytics-secondary-col">
+                    <DomainChart />
+                  </div>
                 </div>
-              </div>
+              )}
 
               {/* 4. Structured Data Matrix Table */}
               <div className="analytics-matrix-section">
@@ -280,6 +308,57 @@ export const Dashboard = () => {
           )}
         </div>
       </div>
+
+      {/* Influencer Telemetry Modal */}
+      {showTelemetryModal && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.75)',
+            backdropFilter: 'blur(16px)',
+            zIndex: 100,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '1rem'
+          }}
+          onClick={() => setShowTelemetryModal(false)}
+        >
+          <div
+            style={{
+              width: '100%',
+              maxWidth: '540px',
+              position: 'relative'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              type="button"
+              onClick={() => setShowTelemetryModal(false)}
+              style={{
+                position: 'absolute',
+                right: '1rem',
+                top: '1rem',
+                background: 'rgba(255, 255, 255, 0.08)',
+                border: 'none',
+                borderRadius: '50%',
+                width: '32px',
+                height: '32px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#94a3b8',
+                cursor: 'pointer',
+                zIndex: 10
+              }}
+            >
+              <X size={16} />
+            </button>
+            <EngagementMetricLogForm onClose={() => setShowTelemetryModal(false)} />
+          </div>
+        </div>
+      )}
     </div>
   );
 };

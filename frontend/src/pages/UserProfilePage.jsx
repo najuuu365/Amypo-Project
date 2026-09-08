@@ -13,7 +13,8 @@ import {
   LogOut,
   Award,
   TrendingUp,
-  Activity
+  Activity,
+  Megaphone
 } from 'lucide-react';
 import DecryptedText from '../components/reactbits/DecryptedText';
 import './UserProfilePage.css';
@@ -223,6 +224,26 @@ export const UserProfilePage = () => {
             </div>
 
             <div style={{ marginTop: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
+              <Link
+                to="/campaigns"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '6px',
+                  padding: '0.65rem',
+                  borderRadius: '10px',
+                  backgroundColor: 'rgba(168, 85, 247, 0.12)',
+                  border: '1px solid rgba(168, 85, 247, 0.3)',
+                  color: '#e2e8f0',
+                  textDecoration: 'none',
+                  fontSize: '0.85rem',
+                  fontWeight: 600
+                }}
+              >
+                <Megaphone size={14} color="#c084fc" />
+                <span>Explore Campaigns</span>
+              </Link>
               <Link
                 to="/dashboard"
                 style={{
